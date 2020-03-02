@@ -16,7 +16,7 @@
 
         .item {
             display: inline-block;
-            background: #ffb366;
+            background-image: linear-gradient(#ff9933, #ff6666);
             padding: 1.5em;
             margin: 0 0 1.5em;
             width: 100%;
@@ -26,6 +26,10 @@
             border-radius: 3px;
             -moz-border-radius: 3px;
             -webkit-border-radius: 3px;
+            text-shadow: 1px 1px black;
+            -webkit-box-shadow: 2px 3px 36px -5px rgba(255,255,15,1);
+            -moz-box-shadow: 2px 3px 36px -5px rgba(255,255,15,1);
+            box-shadow: 2px 3px 36px -5px rgba(255,255,15,1);
         }
     </style>
 <body style='background: #1d9172'>
@@ -53,7 +57,7 @@
         @foreach (var item in Model.MyTasks)
         {
             <div class="item">
-                <font color="white">
+                <font color=white>
                     <p>@Html.DisplayFor(modelItem => item.Description)</p>
                     <p>@Html.DisplayFor(modelItem => item.Project)</p>
                     <p>@Html.DisplayFor(modelItem => item.Owner)</p>
