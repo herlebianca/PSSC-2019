@@ -11,7 +11,7 @@ namespace MyPlanner.Models
         public Guid id { get; set; }
         [Display(Name = "Name")]
         public string name { get; set; }
-        [Display(Name = "Username")]
+        [Display(Name = "username")]
         public string username { get; set; }
         [Display(Name = "Password")]
         public string encrypted_password { get; set; }

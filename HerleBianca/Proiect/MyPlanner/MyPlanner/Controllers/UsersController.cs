@@ -21,7 +21,7 @@ namespace MyPlanner.Controllers
         {
             _context = context;
             _repository = repository;
-            logged_user = new User();
+           
         }
         /*public UsersController(IUserRepository repository)
         {
@@ -31,7 +31,7 @@ namespace MyPlanner.Controllers
         // GET: Users
         public async Task<IActionResult>  Index()
         {
-            if (logged_user.username == "None")
+            if (logged_user==null)
                 return RedirectToAction("Privacy", "Home"); //Privacy is used as default empty page
             return View( await  _context.User.ToListAsync());
         }
@@ -47,7 +47,7 @@ namespace MyPlanner.Controllers
         // GET: Users/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
-            if(logged_user.username== "None")
+            if(logged_user==null)
                 return RedirectToAction("Privacy", "Home"); //Privacy is used as default empty page
             if (id == null)
             {
@@ -91,6 +91,7 @@ namespace MyPlanner.Controllers
                 if (!use_test_repository)
                 {
                     _context.Add(user);
+                    logged_user = user;
                     await _context.SaveChangesAsync();
                 }
                 else
@@ -212,12 +213,12 @@ namespace MyPlanner.Controllers
         [ValidateAntiForgeryToken]
         public /*async Task<IActionResult>*/ IActionResult Login(User objUser)
         {
-            User user=null;
+            
             if (ModelState.IsValid)
             {
                 
                 // var obj = _context.Where(a => a.UserName.Equals(objUser.UserName) && a.Password.Equals(objUser.Password)).FirstOrDefault();
-                if (use_test_repository)
+                /*if (use_test_repository)
                 {
                     foreach(User item in _repository.GetAllItems())
                     {
@@ -229,7 +230,7 @@ namespace MyPlanner.Controllers
                 }
                     
                 else
-                     user = /*await*/ _context.User.FirstOrDefault/*Async*/(m => m.username == objUser.username);
+                 */  var user = /*await*/ _context.User.FirstOrDefault/*Async*/(m => m.username == objUser.username);
                 if (user != null)
                 {
                     if (SecurePasswordHasherHelper.Verify(objUser.encrypted_password, user.encrypted_password))
@@ -246,11 +247,11 @@ namespace MyPlanner.Controllers
         //GET : Dashboard
         public async Task<IActionResult> Dashboard(string name)
         {
-            if (UsersController.logged_user.username == "None")
+            if (UsersController.logged_user==null)
             {
                 return RedirectToAction("Privacy", "Home"); //Privacy is used as default empty page
             }
-
+            
             // Use LINQ to get list of genres.
             IQueryable<string> asigneeQuery = from m in _context.MyTask
                                               orderby m.Asignee

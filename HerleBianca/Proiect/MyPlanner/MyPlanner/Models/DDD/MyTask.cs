@@ -63,6 +63,13 @@ namespace MyPlanner.Models.DDD
             Logger.Log("Project : " + Project.ToString() + " Task : " + Description.ToString() + " has received a review : " + Review.ToString());
         }
 
+        public TimeSpan DaysLeftAsOf(DateTime dateTime)
+        {
+            if (dateTime > Due_Date.Date)
+                throw new ArgumentOutOfRangeException();
+            return (Due_Date.Date.Subtract(dateTime) );
+        }
+
         public override string ToString()
         {
             string format =

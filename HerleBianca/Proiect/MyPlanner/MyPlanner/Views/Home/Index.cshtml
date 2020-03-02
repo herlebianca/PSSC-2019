@@ -1,18 +1,30 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-<link href='https://fonts.googleapis.com/css?family=Bungee Shade' rel='stylesheet'>
+<link href='https://fonts.googleapis.com/css?family=Londrina Shadow' rel='stylesheet'>
+
+<style>
+    div.a {
+        position:absolute;
+        top: 170px;
+        left: 100px;
+        font-family: 'Londrina Shadow';
+        color: antiquewhite;        
+        font-size: 80px;
+        line-height:100%;
+    }
+    div.b{
+        position:absolute;
+        right:100px;
+        top:70px;        
+    }
+
+</style>
 <body>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <div style="background-image: url('https://info.lululemon.com/content/dam/lululemon/www-images/Features%20-%20redesign%20launch%20assets/this-just-in/Six%20Meditation%20Apps/Imagecomponent_meditationApps_NewSite_01.jpg' );  width: 1080px; height: 497px; overflow: hidden; display: inline-block;" class="text-center">
-        <style>
-            h1 {
-                font-family: 'Bungee Shade';
-                font-size: 22px;
-            }
-        </style>
-        <h1 class="display-4">Welcome</h1>
-    </div>
+    <div class="a">Say hello to <br> your everyday <br> everything app</div>
+    <div class="b"><img src="~/Content/Images/home344x459.jpg"></div>
+
     @if (ViewBag.Message != null)
     {
         <script type="text/javascript">
