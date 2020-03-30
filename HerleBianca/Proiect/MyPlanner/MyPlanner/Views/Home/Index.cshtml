@@ -2,35 +2,52 @@
     ViewData["Title"] = "Home Page";
 }
 <link href='https://fonts.googleapis.com/css?family=Londrina Shadow' rel='stylesheet'>
-
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
     div.a {
         position:absolute;
-        top: 170px;
-        left: 100px;
+        top:30%;
+        max-width:100%;
+        height:auto;
+        float: left;
         font-family: 'Londrina Shadow';
-        color: antiquewhite;        
+        color: antiquewhite;
         font-size: 80px;
-        line-height:100%;
+        line-height: 100%;
+
     }
-    div.b{
-        position:absolute;
-        right:100px;
-        top:70px;        
+
+    div.b {
+        
+        float: right;
+        max-width:100%;
+        height:auto;
+
+    }
+
+    div.container {    
+     
+    grid-template-columns: repeat(auto-fit, 100px);
+      
     }
 
 </style>
-<body>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <div class="a">Say hello to <br> your everyday <br> everything app</div>
-    <div class="b"><img src="~/Content/Images/home344x459.jpg"></div>
+<body style='background:#1d9172'>
+    <div class="container">
+        <div class="a">
+        Say hello to <br> your everyday <br> everything app
+        </div>
 
-    @if (ViewBag.Message != null)
-    {
-        <script type="text/javascript">
+        <div class="w3-hide-small w3-hide-medium b"><img src="~/Content/Images/home344x459.jpg"></div>
+</div>
+
+        @if (ViewBag.Message != null)
+        {
+            <script type="text/javascript">
             window.onload = function () {
                 alert("@ViewBag.Message");
             };
-        </script>
-    }
+            </script>
+        }
 </body>
