@@ -14,19 +14,11 @@ namespace MyPlanner.Controllers
     public class UsersController : Controller
     {
         private readonly MyPlannerContext _context;
-        private IUserRepository _repository;
-        public bool use_test_repository = false;
         public static User logged_user;
-        public UsersController(MyPlannerContext? context, IUserRepository repository=null)
+        public UsersController(MyPlannerContext context)
         {
-            _context = context;
-            _repository = repository;
-           
+            _context = context;           
         }
-        /*public UsersController(IUserRepository repository)
-        {
-            _repository = repository;
-        }*/
 
         // GET: Users
         public async Task<IActionResult>  Index()
@@ -36,14 +28,6 @@ namespace MyPlanner.Controllers
             return View( await  _context.User.ToListAsync());
         }
 
-        public IActionResult Index_test()
-        {
-            if (_repository != null)
-                return View("Index", _repository.GetAllItems());
-            else
-                return View();
-        }
-
         // GET: Users/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
@@ -51,15 +35,15 @@ namespace MyPlanner.Controllers
                 return RedirectToAction("Privacy", "Home"); //Privacy is used as default empty page
             if (id == null)
             {
-                id = logged_user.id;
+                id = logged_user.Id;
             }
 
-            var user = await _context.User.FirstOrDefaultAsync(m => m.id == id);
+            var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
 
             var myTasks = from m in _context.MyTask select m;
             var myTasks2 = from m in _context.MyTask select m;
-            myTasks = myTasks.Where(s => s.Asignee.Contains(user.name));
-            myTasks2 = myTasks.Where(s => s.Owner.Contains(user.name));
+            myTasks = myTasks.Where(s => s.Asignee.Contains(user.username));
+            myTasks2 = myTasks.Where(s => s.Owner.Contains(user.username));
             user.MyTasks_asigned = await myTasks.ToListAsync();
             user.MyTasks_owner = await myTasks2.ToListAsync();
 
@@ -82,20 +66,16 @@ namespace MyPlanner.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("id,name,username,encrypted_password")] User user)
+        public async Task<IActionResult> Create([Bind("id,first_name,last_name,username,encrypted_password,age,other_ocupation,email,picture_path,rating,phone_number")] User user)
         {
             if (ModelState.IsValid)
             {
-                user.id = Guid.NewGuid();
+                user.Id = Guid.NewGuid();
                 user.encrypted_password = SecurePasswordHasherHelper.Hash(user.encrypted_password);
-                if (!use_test_repository)
-                {
-                    _context.Add(user);
-                    logged_user = user;
-                    await _context.SaveChangesAsync();
-                }
-                else
-                    _repository.AddItem(user);
+                user.encrypted_password = user.encrypted_password;
+                _context.Add(user);
+                logged_user = user;
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(user);
@@ -105,17 +85,17 @@ namespace MyPlanner.Controllers
         public async Task<IActionResult> Edit(Guid? id)
         {
           
-            if (id == null)
+           /* if (id == null)
             {
                 return NotFound();
             }
-
+            */
             var user = await _context.User.FindAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
-            if (logged_user.id != user.id)
+            if (logged_user.Id != user.Id)
             {
                 ViewBag.Message = string.Format("You are not allowed to edit this user information");
             }
@@ -127,29 +107,32 @@ namespace MyPlanner.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("id,name,username,encrypted_password,age,other_ocupation")] User user)
+        public async Task<IActionResult> Edit(Guid id, [Bind("id,first_name,last_name,username,encrypted_password,age,other_ocupation,email,picture_path,rating,phone_number")] User user)
         {
-            if (id != user.id)
+           /* if (id != user.Id)
             {
                 return NotFound();
-            }
-            if (logged_user.id == user.id)
+            }*/
+            if (logged_user.Id == user.Id)
             {
                 if (ModelState.IsValid)
                 {
                     try
                     {
-                        var updated = _context.User.Find(user.id);
-                        updated.name = user.name;
+                        var updated = _context.User.Find(user.Id);
+                        updated.first_name = user.first_name;
+                        updated.last_name = user.last_name;
                         updated.username = user.username;
                         updated.age = user.age;
                         updated.other_ocupation = user.other_ocupation;
+                        updated.phone_number = user.phone_number;
+                        updated.email = user.email;
                         _context.Update(updated);
                         await _context.SaveChangesAsync();
                     }
                     catch (DbUpdateConcurrencyException)
                     {
-                        if (!UserExists(user.id))
+                        if (!UserExists(user.Id))
                         {
                             return NotFound();
                         }
@@ -158,6 +141,7 @@ namespace MyPlanner.Controllers
                             throw;
                         }
                     }
+                    ViewBag.Message = string.Format("Your changes have been saved");
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -171,13 +155,13 @@ namespace MyPlanner.Controllers
             {
                 return NotFound();
             }
-            var user = await _context.User.FirstOrDefaultAsync(m => m.id == id);
+            var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
             
                 if (user == null)
             {
                 return NotFound();
             }
-            if (logged_user.id != user.id)
+            if (logged_user.Id != user.Id)
             {
                 ViewBag.Message = string.Format("You are not allowed to delete this user");
             }
@@ -190,7 +174,7 @@ namespace MyPlanner.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var user = await _context.User.FindAsync(id);
-            if (logged_user.id == user.id)
+            if (logged_user.Id == user.Id)
             {
                 _context.User.Remove(user);
                 await _context.SaveChangesAsync();
@@ -200,7 +184,7 @@ namespace MyPlanner.Controllers
 
         private bool UserExists(Guid id)
         {
-            return _context.User.Any(e => e.id == id);
+            return _context.User.Any(e => e.Id == id);
         }
         //GET: Login
         public ActionResult Login()
@@ -211,37 +195,22 @@ namespace MyPlanner.Controllers
         //POST: Login
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public /*async Task<IActionResult>*/ IActionResult Login(User objUser)
+        public async Task<IActionResult> Login(User objUser)
         {
             
-            if (ModelState.IsValid)
-            {
-                
-                // var obj = _context.Where(a => a.UserName.Equals(objUser.UserName) && a.Password.Equals(objUser.Password)).FirstOrDefault();
-                /*if (use_test_repository)
-                {
-                    foreach(User item in _repository.GetAllItems())
-                    {
-                        if (item.username==objUser.username)
-                        {
-                            user = item;
-                        }
-                    }
-                }
-                    
-                else
-                 */  var user = /*await*/ _context.User.FirstOrDefault/*Async*/(m => m.username == objUser.username);
+            if (ModelState.IsValid)          
+            {                
+                var user = await _context.User.FirstOrDefaultAsync(m => m.username == objUser.username);
                 if (user != null)
                 {
                     if (SecurePasswordHasherHelper.Verify(objUser.encrypted_password, user.encrypted_password))
-                    {
-                        logged_user = user;                       
-                        return RedirectToAction("Dashboard", logged_user);// new User(user.name,user.username,user.encrypted_password));
-                    }
+                        logged_user = user;
+                        return RedirectToAction("Dashboard", logged_user);
                         
                 }
                 
             }
+            ViewBag.Message = string.Format("Incorrect username or password");
             return View("Login",objUser);
         }
         //GET : Dashboard
@@ -262,18 +231,19 @@ namespace MyPlanner.Controllers
 
             if (string.IsNullOrEmpty(name))
             {
-                name = logged_user.name;
+                name = logged_user.username;
             }
 
             myTasks = myTasks.Where(x => x.Asignee == name);
 
-            var myTaskAsigneeVM = new MyTaskAsigneeViewModel
-            {
-                Asignees = new SelectList(await asigneeQuery.Distinct().ToListAsync()),
-                MyTasks = await myTasks.ToListAsync()
-            };
-
+              var myTaskAsigneeVM = new MyTaskAsigneeViewModel
+              {
+                  Asignees = new SelectList(await asigneeQuery.Distinct().ToListAsync()),
+                  MyTasks = await myTasks.ToListAsync()
+              };
+              
             return View(myTaskAsigneeVM);
+           
         }
     }
 }

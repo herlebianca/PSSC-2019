@@ -10,7 +10,9 @@ namespace MyPlanner.Models
     {
         public List<MyTask> MyTasks { get; set; }
         public SelectList Asignees { get; set; }
-        public string MyTaskAsignee { get; set; }
-        public string SearchString { get; set; }
+        public string MyTaskAsignee { get; set; }        
+        public SelectList Tags { get; set; }
+        public MyTask.TagType MyTaskTag { get; set; }
+        public string Location { get; set; }
     }
 }

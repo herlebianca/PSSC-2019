@@ -32,6 +32,7 @@
             -webkit-box-shadow: 10px 10px 5px 0px rgba(69,44,69,1);
             -moz-box-shadow: 10px 10px 5px 0px rgba(69,44,69,1);
             box-shadow: 10px 10px 5px 0px rgba(69,44,69,1);
+        }
     </style>
     <body style="background:#1a1a1a">
         <h1><font color="white">List of registered users</font></h1>
@@ -44,14 +45,19 @@
             {
                 <div class="item">
                     <font color=white>
-                        <p> @Html.DisplayFor(modelItem => item.name)</p>
-                        <p>@Html.DisplayFor(modelItem => item.username)</p>
-                        
-                            <p>
-                                <a asp-action="Edit" asp-route-id="@item.id"><font color="white">Edit |</font></a>
-                                <a asp-action="Details" asp-route-id="@item.id"><font color="white">Profile |</font></a>
-                                <a asp-action="Delete" asp-route-id="@item.id"><font color="white">Delete</font></a>
-                            </p>
+                        <p>First name: @Html.DisplayFor(modelItem => item.first_name)</p>
+                        <p>Last name: @Html.DisplayFor(modelItem => item.last_name)</p>
+                        <p> Age: @Html.DisplayFor(modelItem => item.age)</p>
+                        <p> Other ocupation: @Html.DisplayFor(modelItem => item.other_ocupation)</p>
+                        <p> Phone number: @Html.DisplayFor(modelItem => item.phone_number)</p>
+                        <p> Username: @Html.DisplayFor(modelItem => item.username)</p>
+                        <p> Rating: @Html.DisplayFor(modelItem => item.rating_float) <img src="~/Content/Images/star.png" width="22" height="22" /> </p>
+
+                        <p>
+                            <a asp-action="Edit" asp-route-id="@item.Id"><font color="white">Edit |</font></a>
+                            <a asp-action="Details" asp-route-id="@item.Id"><font color="white">Profile |</font></a>
+                            <a asp-action="Delete" asp-route-id="@item.Id"><font color="white">Delete</font></a>
+                        </p>
                     </font>
                 </div>
 

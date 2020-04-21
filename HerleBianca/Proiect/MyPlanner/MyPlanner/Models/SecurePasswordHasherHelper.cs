@@ -73,7 +73,7 @@ namespace MyPlanner.Models
             //check hash
             if (!IsHashSupported(hashedPassword))
             {
-               throw new NotSupportedException("The hashtype is not supported");
+                throw new NotSupportedException("The hashtype is not supported");
             }
 
             //extract iteration and Base64 string

@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyPlanner.Models
 {
-    public class MyTask //used with Entity Framework
+    public class MyTask 
     {
         [Display(Name = "Id")]
         private Guid _id;
@@ -28,19 +28,11 @@ namespace MyPlanner.Models
         [DataType(DataType.Date)]
         [Display(Name = "Due Date")]
         private DateTime _due_date;
-        
+
         public DateTime Due_Date
         {
             get { return _due_date; }
             set { this._due_date = value; }
-        }
-
-        [Display(Name = "Project")]
-        private string _project; //each task is part of a project
-        public string Project
-        {
-            get { return this._project; }
-            set { this._project = value; }
         }
 
         [Display(Name = "Owner")]
@@ -51,19 +43,105 @@ namespace MyPlanner.Models
             set { this._owner_name = value; }
         }
 
+        [Display(Name = "Location")]
+        private string _location { get; set; }
+        public string Location
+        {
+            get { return this._location; }
+            set { this._location = value; }
+        }
+
+        [Display(Name = "Urgency")]
+        private HowUrgentType _urgency { get; set; }
+        public HowUrgentType Urgency
+        {
+            get { return this._urgency; }
+            set { this._urgency = value; }
+        }
+
+        public enum HowUrgentType
+        {
+            [Display(Name = "Today")]
+            Today,
+            [Display(Name = "Tomorrow")]
+            Tomorrow,
+            [Display(Name = "This week")]
+            This_week,
+            [Display(Name = "Next week")]
+            Next_week,
+            [Display(Name = "This month")]
+            This_month,
+            [Display(Name = "Anytime")]
+            Anytime
+        }
+
+        [Display(Name = "Involves transfer")]
+        private FakeBoolType _transfer { get; set; }
+        public FakeBoolType Transfer
+        {
+            get { return this._transfer; }
+            set { this._transfer = value; }
+        }
+
+        public enum FakeBoolType
+        {
+            [Display(Name = "Yes")]
+            Yes,
+            [Display(Name = "No")]
+            No,
+        }
+
+        [Display(Name = "Duration in hours")]
+        private int _duration { get; set; }
+        public int Duration
+        {
+            get { return this._duration; }
+            set { this._duration = value; }
+        }
+
+        [Display(Name = "Involves physical effort")]
+        private FakeBoolType _physical_effort { get; set; }
+        public FakeBoolType Physical_Effort
+        {
+            get { return this._physical_effort; }
+            set { this._physical_effort = value; }
+        }
+
+        [Display(Name = "Tag")]
+        private TagType _tag { get; set; }
+        public TagType Tag
+        {
+            get { return this._tag; }
+            set { this._tag = value; }
+        }
+
+        public enum TagType
+        {
+            [Display(Name = "Delivery")]
+            Delivery,
+            [Display(Name = "Shopping")]
+            Shopping,
+            [Display(Name = "Transfer")]
+            Transfer,
+            [Display(Name = "Specialized Assistance")]
+            SpecializedAssistance,
+            [Display(Name = "Pet Care")]
+            PetCare,
+            [Display(Name = "Cleaning")]
+            Cleaning,
+            [Display(Name = "Rental")]
+            Rental,
+            [Display(Name = "Other")]
+            Other
+
+        }
+
         [Display(Name = "Asignee")]
         private string _asignee_name;
         public string Asignee
         {
             get { return this._asignee_name; }
             set { this._asignee_name = value; }
-        }
-
-        private string _review { get; set; }
-        public string Review
-        {
-            get { return this._review; }
-            set { this._review = value; }
         }
 
         [Display(Name = "Status")]
@@ -79,8 +157,25 @@ namespace MyPlanner.Models
             NotStarted,
             [Display(Name = "In Progress")]
             InProgress,
+            [Display(Name = "Blocked")]
             Blocked,
+            [Display(Name = "Done")]
             Done
+        }
+
+        private RatingType _rating { get; set; }
+        public RatingType Rating
+        {
+            get { return this._rating; }
+            set { this._rating = value; }
+        }
+
+        private float _rating_float { get; set; }
+        [Display(Name = "Rating")]
+        public float RatingFloat
+        {
+            get { return this._rating_float; }
+            set { this._rating_float = value; }
         }
 
         public MyTask()
@@ -88,24 +183,47 @@ namespace MyPlanner.Models
             this._id = new Guid();
             this._description = "default description";
             this._due_date = DateTime.Today;
-            this._project = "default project";
             this._owner_name = "default owner name";
-            this._asignee_name = "default asignee name";
+            this._location = "default location";
+            this._urgency = HowUrgentType.Anytime;
+            this._transfer = FakeBoolType.No;
+            this._duration = 0;
+            this._physical_effort = FakeBoolType.No;
+            this._tag = TagType.Other;
+            this._asignee_name = null;
             this._status = StatusType.NotStarted;
-            this._review = "None";
+            this._rating = RatingType.FiveStars;
+            this._rating_float = 5;
         }
-        public MyTask(string description, DateTime due_date, string project, string _owner_name, string _asignee_name, StatusType status,string review)
+        public MyTask(string description, DateTime due_date, string owner_name, string location, HowUrgentType urgency, FakeBoolType transfer, int duration, FakeBoolType physical_effort, TagType tag, string asignee_name=null, RatingType rating=RatingType.FiveStars, StatusType status=StatusType.NotStarted)
         {
             this._id = new Guid();
-            this._description = description;
-            this._due_date = due_date;
-            this._project = project;
-            this._owner_name = _owner_name;
-            this._asignee_name = _asignee_name;
-            this._status = status;
-            this._review = review;
+            this._description     = description;
+            this._due_date        = due_date;
+            this._owner_name      = owner_name;
+            this._location        = location;
+            this._urgency         = urgency;
+            this._transfer        = transfer;
+            this._duration        = duration;
+            this._physical_effort = physical_effort;
+            this._tag             = tag;
+            this._asignee_name    = asignee_name;
+            this._status          = status;
+            this._rating          = rating;
+            this._rating_float = 5;
         }
-
+    }
+    public enum RatingType
+    {
+        
+        OneStar,
+       
+        TwoStars,
+        
+        ThreeStars,
+        
+        FourStars,
+       
+        FiveStars
     }
 }
-

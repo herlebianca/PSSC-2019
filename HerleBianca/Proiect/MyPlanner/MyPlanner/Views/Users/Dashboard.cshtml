@@ -47,16 +47,22 @@
         {
             <div class="item">
                 <font color=white>
-                    <p>@Html.DisplayFor(modelItem => item.Description)</p>
-                    <p>@Html.DisplayFor(modelItem => item.Project)</p>
-                    <p>@Html.DisplayFor(modelItem => item.Owner)</p>
-                    <p>@Html.DisplayFor(modelItem => item.Asignee)</p>
-                    <p> @Html.DisplayFor(modelItem => item.Status)</p>
-                    <p>@Html.DisplayFor(modelItem => item.Review)</p>
+                    <p>Description: @Html.DisplayFor(modelItem => item.Description)</p>
+                        <p>Due date: @Html.DisplayFor(modelItem => item.Due_Date)</p>
+                        <p>Owner: @Html.DisplayFor(modelItem => item.Owner)</p>
+                        <p>Location: @Html.DisplayFor(modelItem => item.Location)</p>
+                        <p>Urgency: @Html.DisplayFor(modelItem => item.Urgency)</p>
+                        <p>Transfer: @Html.DisplayFor(modelItem => item.Transfer)</p>
+                        <p>Duration: @Html.DisplayFor(modelItem => item.Duration) hours</p>
+                        <p>Involves physical effort: @Html.DisplayFor(modelItem => item.Physical_Effort)</p>
+                        <p>Tag: @Html.DisplayFor(modelItem => item.Tag)</p>
+                        <p>Asignee: @Html.DisplayFor(modelItem => item.Asignee)</p>
+                        <p>Status: @Html.DisplayFor(modelItem => item.Status)</p>
+                        <p>Rating: @Html.DisplayFor(modelItem => item.RatingFloat) <img src="~/Content/Images/star.png" width="22" height="22" /></p>
                     <p>
-                        <a asp-action="Edit" asp-route-id="@item.Id" asp-route-from_dashboard="no"><font color="white">Edit |</font></a>
-                        <a asp-action="Details" asp-route-id="@item.Id"><font color="white">Details |</font></a>
-                        <a asp-action="Delete" asp-route-id="@item.Id"><font color="white">Delete</font></a>
+                        <a asp-controller="MyTasks" asp-action="Edit" asp-route-id="@item.Id" asp-route-from_dashboard="no"><font color="white">Edit |</font></a>
+                        <a asp-controller="MyTasks" asp-action="Details" asp-route-id="@item.Id"><font color="white">Details |</font></a>
+                        <a asp-controller="MyTasks" asp-action="Delete" asp-route-id="@item.Id"><font color="white">Delete</font></a>
                     </p>
                 </font>
             </div>

@@ -21,9 +21,34 @@
             <form asp-action="Create">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
-                    <label asp-for="name" class="control-label"><font color="white">Name</font></label>
-                    <input asp-for="name" class="form-control" />
-                    <span asp-validation-for="name" class="text-danger"></span>
+                    <label asp-for="first_name" class="control-label"><font color="white">First Name</font></label>
+                    <input asp-for="first_name" class="form-control" />
+                    <span asp-validation-for="first_name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="last_name" class="control-label"><font color="white">Last Name</font></label>
+                    <input asp-for="last_name" class="form-control" />
+                    <span asp-validation-for="last_name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="age" class="control-label"><font color="white">Age</font></label>
+                    <input asp-for="age" class="form-control" />
+                    <span asp-validation-for="age" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="other_ocupation" class="control-label"><font color="white">Other ocupation</font></label>
+                    <input asp-for="other_ocupation" class="form-control" />
+                    <span asp-validation-for="other_ocupation" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="email" class="control-label"><font color="white">Email</font></label>
+                    <input asp-for="email" class="form-control" />
+                    <span asp-validation-for="email" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="phone_number" class="control-label"><font color="white">Phone</font></label>
+                    <input asp-for="phone_number" class="form-control" />
+                    <span asp-validation-for="phone_number" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="username" class="control-label"><font color="white">Username</font></label>

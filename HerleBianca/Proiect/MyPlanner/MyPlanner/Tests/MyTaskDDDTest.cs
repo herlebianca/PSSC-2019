@@ -15,12 +15,15 @@ namespace MyPlanner.Tests
         [Category("pass")]
         public void BasicFunctionsShouldWork()
         {
+            // Arrange
             var my_task = MyTaskFactory.Instance.CreateTask("test_description", DateTime.Today, "test_project", "test_owner", "test_asignee", MyTask.Convert("InProgress"), "test_review");
-
+            
+            // Act
             my_task.AssignTask(new Volunteer("Bianca"));
             my_task.ChangeStatus(MyTask.Convert("Done"));
             my_task.GiveReview(new PlainText("very well"));
-
+            
+            // Assert
             Assert.AreEqual("Bianca", my_task.Asignee.ToString());
             Assert.AreEqual(MyTask.Convert("Done"), my_task.Status);
             Assert.AreEqual("very well", my_task.Review.ToString());
@@ -59,11 +62,13 @@ namespace MyPlanner.Tests
 
         [Test]
         [Category("fail")]
-        public void DaysLeftAsOfShouldFail()
+        [TestCase ("2019-01-12")] //One day before start date - OFF
+        [TestCase ("2020-16-01")] //One day after - OFF
+        public void DaysLeftAsOfShouldFail(string s)
         {
             var logMock = new Moq.Mock<IEventLogger>();
             var my_task = MyTaskFactory.Instance.CreateTask("test_description", DateTime.Parse("2020-15-01"), "test_project", "test_owner", "test_asignee", MyTask.Convert("InProgress"), "test_review", logMock.Object);
-            Assert.That(() => my_task.DaysLeftAsOf(DateTime.Parse("2020-16-01")), Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(() => my_task.DaysLeftAsOf(DateTime.Parse(s)), Throws.TypeOf<ArgumentOutOfRangeException>());
         }
 
         [Test]

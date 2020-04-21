@@ -3,71 +3,108 @@
 @{
     ViewData["Title"] = "Edit";
 }
-    <body style="background:#1d9172">
-        <h1>Edit</h1>
+<style>
+    body {
+        background: #1d9172;
+        color: antiquewhite;
+    }
+    .btnstyle{  background-color: #ff9966; 
+                border-color: #ff9966;
+    }
+    .btnstyle:hover{ background-color: coral;
+                     border-color:antiquewhite;
+                     color: antiquewhite;
+    }
+</style>
+<body >
+    <h1>Edit</h1>
 
-        <h4>MyTask</h4>
-        <hr />
-        <div class="row">
-            <div class="col-md-4">
-                <form asp-action="Edit">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <input type="hidden" asp-for="Id" />
-                    <div class="form-group">
-                        <label asp-for="Description" class="control-label"></label>
-                        <input asp-for="Description" class="form-control" />
-                        <span asp-validation-for="Description" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Due_Date" class="control-label"></label>
-                        <input asp-for="Due_Date" class="form-control" />
-                        <span asp-validation-for="Due_Date" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Project" class="control-label"></label>
-                        <input asp-for="Project" class="form-control" />
-                        <span asp-validation-for="Project" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Owner" class="control-label"></label>
-                        <input asp-for="Owner" class="form-control" />
-                        <span asp-validation-for="Owner" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Asignee" class="control-label"></label>
-                        <input asp-for="Asignee" class="form-control" />
-                        <span asp-validation-for="Asignee" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Status" class="control-label"></label>
-                        <select asp-for="Status" asp-items="Html.GetEnumSelectList<MyTask.StatusType>()" class="form-control"></select>
-                        <span asp-validation-for="Status" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Review" class="control-label"></label>
-                        <input asp-for="Review" class="form-control" />
-                        <span asp-validation-for="Review" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <input type="submit" value="Save" class="btn btn-primary" />
-                    </div>
-                </form>
-                @if (ViewBag.Message != null)
-                {
-                    <script type="text/javascript">
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Due_Date" class="control-label">Due date</label>
+                    <input asp-for="Due_Date" class="form-control" />
+                    <span asp-validation-for="Due_Date" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Owner" class="control-label"></label>
+                    <input asp-for="Owner" class="form-control" />
+                    <span asp-validation-for="Owner" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Location" class="control-label"></label>
+                    <input asp-for="Location" class="form-control" />
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Urgency" class="control-label"></label>
+                    <select asp-for="Urgency" asp-items="Html.GetEnumSelectList<MyTask.HowUrgentType>()" class="form-control"></select>
+                    <span asp-validation-for="Urgency" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Transfer" class="control-label"></label>
+                    <select asp-for="Transfer" asp-items="Html.GetEnumSelectList<MyTask.FakeBoolType>()" class="form-control"></select>
+                    <span asp-validation-for="Transfer" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Duration" class="control-label">Duration in hours</label>
+                    <input asp-for="Duration" class="form-control" />
+                    <span asp-validation-for="Duration" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Physical_Effort" class="control-label">Physical effort</label>
+                    <select asp-for="Physical_Effort" asp-items="Html.GetEnumSelectList<MyTask.FakeBoolType>()" class="form-control"></select>
+                    <span asp-validation-for="Physical_Effort" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Tag" class="control-label"></label>
+                    <select asp-for="Tag" asp-items="Html.GetEnumSelectList<MyTask.TagType>()" class="form-control"></select>
+                    <span asp-validation-for="Tag" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Asignee" class="control-label"></label>
+                    <input asp-for="Asignee" class="form-control" />
+                    <span asp-validation-for="Asignee" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Status" class="control-label"></label>
+                    <select asp-for="Status" asp-items="Html.GetEnumSelectList<MyTask.StatusType>()" class="form-control"></select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Rating" class="control-label"></label>
+                    <input asp-for="Rating" class="form-control" />
+                    <span asp-validation-for="Rating" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary btnstyle" />
+                </div>
+            </form>
+            @if (ViewBag.Message != null)
+            {
+                <script type="text/javascript">
             window.onload = function () {
                 alert("@ViewBag.Message");
             };
-                    </script>
-                }
-            </div>
+                </script>
+            }
         </div>
+    </div>
 
-        <div>
-            <a asp-action="Index">Back to List</a>
-        </div>
+    <div>       
+        <a asp-action="Index"> <font color="white">Back to List</font></a>        
+    </div>
 
-        @section Scripts {
-            @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-        }
-    </body>
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
+</body>

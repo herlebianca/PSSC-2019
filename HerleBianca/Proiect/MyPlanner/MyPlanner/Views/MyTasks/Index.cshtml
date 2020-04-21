@@ -32,55 +32,61 @@
             box-shadow: 10px 10px 5px 0px rgba(69,44,69,1);
         }
     </style>
-<body style='background:#1a1a1a'>
-    <h1> <font color="white">Available Tasks</font></h1>
+    <body style='background:#1a1a1a'>
+        <h1> <font color="white">Available Tasks</font></h1>
 
-    <p>
-        <font color="white">
-            <a asp-action="Create"><font color="white">Create New</font></a>
-        </font>
-    </p>
-    <form asp-controller="MyTasks" asp-action="Index" method="get">
         <p>
             <font color="white">
-                Asignee:
-                <select asp-for="MyTaskAsignee" asp-items="Model.Asignees">
-                    <option value="">All</option>
-                </select>
-
-                Project: <input type="text" asp-for="SearchString" />
-                <input type="submit" value="Filter" />
+                <a asp-action="Create"><font color="white">Create New</font></a>
             </font>
         </p>
-    </form>
-    <div class="masonry">
-        @foreach (var item in Model.MyTasks)
-        {
-            <div class="item">
-                <font color=white>
-                    <p>@Html.DisplayFor(modelItem => item.Description)</p>
-                    <p>@Html.DisplayFor(modelItem => item.Project)</p>
-                    <p>@Html.DisplayFor(modelItem => item.Owner)</p>
-                    <p>@Html.DisplayFor(modelItem => item.Asignee)</p>
-                    <p> @Html.DisplayFor(modelItem => item.Status)</p>
-                    <p>@Html.DisplayFor(modelItem => item.Review)</p>
-                    <p>
-                        <a asp-action="Edit" asp-route-id="@item.Id" asp-route-from_dashboard="no"><font color="white">Edit |</font></a>
-                        <a asp-action="Details" asp-route-id="@item.Id"><font color="white">Details |</font></a>
-                        <a asp-action="Delete" asp-route-id="@item.Id"><font color="white">Delete</font></a>
-                    </p>
-                </font>
-            </div>
-            
-        }
-    </div>
+        <form asp-controller="MyTasks" asp-action="Index" method="get">
+            <p>
+                <font color="white">
+                    Tag:
+                    <select asp-for="MyTaskTag" asp-items="Model.Tags">
+                        <option value="">All</option>
+                    </select>
 
-    @if (ViewBag.Message != null)
-    {
-        <script type="text/javascript">
+                    Location: <input type="text" asp-for="Location" />
+                    <input type="submit" value="Filter" />
+                </font>
+            </p>
+        </form>
+        <div class="masonry">
+            @foreach (var item in Model.MyTasks)
+            {
+                <div class="item">
+                    <font color=white>
+                        <p>Description: @Html.DisplayFor(modelItem => item.Description)</p>
+                        <p>Due date: @Html.DisplayFor(modelItem => item.Due_Date)</p>
+                        <p>Owner: @Html.DisplayFor(modelItem => item.Owner)</p>
+                        <p>Location: @Html.DisplayFor(modelItem => item.Location)</p>
+                        <p>Urgency: @Html.DisplayFor(modelItem => item.Urgency)</p>
+                        <p>Transfer: @Html.DisplayFor(modelItem => item.Transfer)</p>
+                        <p>Duration: @Html.DisplayFor(modelItem => item.Duration) hours</p>
+                        <p>Involves physical effort: @Html.DisplayFor(modelItem => item.Physical_Effort)</p>
+                        <p>Tag: @Html.DisplayFor(modelItem => item.Tag)</p>
+                        <p>Asignee: @Html.DisplayFor(modelItem => item.Asignee)</p>
+                        <p>Status: @Html.DisplayFor(modelItem => item.Status)</p>
+                        <p>Rating: @Html.DisplayFor(modelItem => item.RatingFloat) <img src="~/Content/Images/star.png" width="22" height="22" /></p>
+                        <p>
+                            <a asp-action="Edit" asp-route-id="@item.Id" asp-route-from_dashboard="no"><font color="white">Edit |</font></a>
+                            <a asp-action="Details" asp-route-id="@item.Id"><font color="white">Details |</font></a>
+                            <a asp-action="Delete" asp-route-id="@item.Id"><font color="white">Delete</font></a>
+                        </p>
+                    </font>
+                </div>
+
+            }
+        </div>
+
+        @if (ViewBag.Message != null)
+        {
+            <script type="text/javascript">
             window.onload = function () {
                 alert("@ViewBag.Message");
             };
-        </script>
-    }
-</body>
+            </script>
+        }
+    </body>

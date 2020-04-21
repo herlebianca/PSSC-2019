@@ -21,36 +21,39 @@ namespace MyPlanner.Controllers
         }
        
         // GET: MyTasks
-        public async Task<IActionResult> Index(string myTaskAsignee, string searchString)
+        public async Task<IActionResult> Index(string myTaskTag, string location)
         {
+            
             if (UsersController.logged_user==null)
             {
                 return RedirectToAction("Privacy", "Home");
             }
             
-            IQueryable<string> asigneeQuery = from m in _context.MyTask
-                                            orderby m.Asignee
-                                            select m.Asignee;
+            IQueryable<MyTask.TagType> tagsQuery = from m in _context.MyTask
+                                            orderby m.Tag
+                                            select m.Tag;
 
             var myTasks = from m in _context.MyTask select m;
 
-            if (!string.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrEmpty(location))
             {
-                myTasks = myTasks.Where(s => s.Project.Contains(searchString));
+                myTasks = myTasks.Where(s => s.Location.Contains(location));
+            }
+            
+            if (!string.IsNullOrEmpty(myTaskTag))
+            {
+                MyTask.TagType tag =( MyTask.TagType) Enum.Parse(typeof(MyTask.TagType), myTaskTag);
+                myTasks = myTasks.Where(x => x.Tag == tag);
             }
 
-            if (!string.IsNullOrEmpty(myTaskAsignee))
-            {
-                myTasks = myTasks.Where(x => x.Asignee == myTaskAsignee);
-            }
-
-            var myTaskAsigneeVM = new MyTaskAsigneeViewModel
-            {
-                Asignees = new SelectList(await asigneeQuery.Distinct().ToListAsync()),
-                MyTasks = await myTasks.ToListAsync()
-            };
-
+              var myTaskAsigneeVM = new MyTaskAsigneeViewModel
+              {
+                  Tags = new SelectList(await tagsQuery.Distinct().ToListAsync()),
+                  MyTasks = await myTasks.ToListAsync()
+              };
+             
             return View(myTaskAsigneeVM);
+           
         }
 
         // GET: MyTasks/Details/5
@@ -61,8 +64,7 @@ namespace MyPlanner.Controllers
                 return NotFound();
             }
 
-            var myTask = await _context.MyTask
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var myTask = await _context.MyTask.FirstOrDefaultAsync(m => m.Id == id);
             if (myTask == null)
             {
                 return NotFound();
@@ -82,7 +84,7 @@ namespace MyPlanner.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Description,Due_Date,Project,Owner,Asignee,Status,Review")] MyTask myTask)
+        public async Task<IActionResult> Create([Bind("Id,Description,Due_Date,Owner,Location,Urgency,Transfer,Duration,Physical_Effort,Tag,Asignee,Status,Rating")] MyTask myTask)
         {
             if (ModelState.IsValid)
             {
@@ -115,7 +117,7 @@ namespace MyPlanner.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Description,Due_Date,Project,Owner,Asignee,Status,Review")] MyTask myTask)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Description,Due_Date,Owner,Location,Urgency,Transfer,Duration,Physical_Effort,Tag,Asignee,Status,Rating")] MyTask myTask)
         {
             if (id != myTask.Id)
             {
