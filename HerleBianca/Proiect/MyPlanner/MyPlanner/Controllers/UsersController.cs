@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using MyPlanner.Data;
 using MyPlanner.Models;
 using MyPlanner.Repository;
+using Microsoft.AspNetCore.Http;
 
 namespace MyPlanner.Controllers
 {
@@ -66,16 +68,23 @@ namespace MyPlanner.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("id,first_name,last_name,username,encrypted_password,age,other_ocupation,email,picture_path,rating,phone_number")] User user)
+        public async Task<IActionResult> Create([Bind("id,first_name,last_name,username,encrypted_password,PictureFile,age,other_ocupation,email,picture_path,rating,phone_number")] User user)
         {
+            
             if (ModelState.IsValid)
             {
                 user.Id = Guid.NewGuid();
                 user.encrypted_password = SecurePasswordHasherHelper.Hash(user.encrypted_password);
-                user.encrypted_password = user.encrypted_password;
+                string fileName = Path.GetFileNameWithoutExtension(user.PictureFile.FileName);
+                string extension = Path.GetExtension(user.PictureFile.FileName);
+                fileName = fileName + DateTime.Now.ToString("yymmssffff") + extension;
+                //user.picture_path = "~/Content/Images/" + fileName;
+                user.picture_path= "C:/Users/bherle/source/repos/MyPlanner/MyPlanner/wwwroot/Content/Images/" + fileName;
+                user.PictureFile.CopyTo(new FileStream(user.picture_path, FileMode.Create));
                 _context.Add(user);
                 logged_user = user;
                 await _context.SaveChangesAsync();
+                ModelState.Clear();
                 return RedirectToAction(nameof(Index));
             }
             return View(user);
@@ -107,19 +116,24 @@ namespace MyPlanner.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("id,first_name,last_name,username,encrypted_password,age,other_ocupation,email,picture_path,rating,phone_number")] User user)
-        {
-           /* if (id != user.Id)
-            {
-                return NotFound();
-            }*/
-            if (logged_user.Id == user.Id)
-            {
-                if (ModelState.IsValid)
-                {
-                    try
+        public async Task<IActionResult> Edit([Bind("id,first_name,last_name,username,PictureFile,encrypted_password,age,other_ocupation,email,picture_path,rating,phone_number")] User user)
+        {            
+        if (ModelState.IsValid)
+         {
+             try
+             {                 
+                 if(logged_user.username == user.username)
                     {
-                        var updated = _context.User.Find(user.Id);
+                        var updated = _context.User.Find(logged_user.Id);
+                        if(user.PictureFile != null)
+                        {
+                            string fileName = Path.GetFileNameWithoutExtension(user.PictureFile.FileName);
+                            string extension = Path.GetExtension(user.PictureFile.FileName);
+                            fileName = fileName + DateTime.Now.ToString("yymmssffff") + extension;
+                            //user.picture_path = "~/Content/Images/" + fileName;
+                            updated.picture_path = "C:/Users/bherle/source/repos/MyPlanner/MyPlanner/wwwroot/Content/Images/" + fileName;
+                            updated.PictureFile.CopyTo(new FileStream(user.picture_path, FileMode.Create));
+                        }
                         updated.first_name = user.first_name;
                         updated.last_name = user.last_name;
                         updated.username = user.username;
@@ -129,22 +143,22 @@ namespace MyPlanner.Controllers
                         updated.email = user.email;
                         _context.Update(updated);
                         await _context.SaveChangesAsync();
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!UserExists(user.Id))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                    ViewBag.Message = string.Format("Your changes have been saved");
-                    return RedirectToAction(nameof(Index));
-                }
-            }
+                    }                
+             }
+             catch (DbUpdateConcurrencyException)
+             {
+                 if (!UserExists(user.Id))
+                 {
+                     return NotFound();
+                 }
+                 else
+                 {
+                     throw;
+                 }
+             }
+             ViewBag.Message = string.Format("Your changes have been saved");
+             return RedirectToAction(nameof(Index));
+         }
             return View(user);
         }
 

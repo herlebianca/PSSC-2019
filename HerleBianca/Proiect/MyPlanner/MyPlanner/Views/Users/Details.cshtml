@@ -8,169 +8,190 @@
         background: #1d9172;
         color: antiquewhite;
     }
+    .divLeft {
+        width:70%;
+        float: left;
+    }
+    .divRight {
+        width:30%;
+        float: right;
+    }
+    .divFull {
+        width:100%;
+    }
 </style>
-<h1><font color="white">Profile</font></h1>
+<h1><font color="antiquewhite">Profile</font></h1>
 <body >
-    <div>
-       
-        <dl class="row">
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.first_name)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.first_name)
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.last_name)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.last_name)
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.age)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.age)
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.other_ocupation)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.other_ocupation)
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.email)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.email)
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.phone_number)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.phone_number)
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.username)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.username)
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.rating_float)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.rating_float) <img src="~/Content/Images/star.png" width="22" height="22"/>
-            </dd>
+    <hr/>
+    <div class="row">
+        <div class="divLeft">
+            <dl class="row">
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.first_name)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.first_name)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.last_name)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.last_name)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.age)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.age)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.other_ocupation)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.other_ocupation)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.email)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.email)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.phone_number)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.phone_number)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.username)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.username)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.rating_float)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.rating_float) <img src="~/Content/Images/star.png" width="22" height="22" />
+                </dd>
+            </dl>
+        </div>
 
-        </dl>
-        <p><font color="white">Assigned to</font></p>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>
-                        <font color="white">
-                            @Html.DisplayNameFor(model => model.MyTasks_asigned[0].Description)
-                        </font>
-                    </th>               
-                    <th>
-                        <font color="white">
-                            @Html.DisplayNameFor(model => model.MyTasks_asigned[0].Tag)
-                        </font>
-                    </th>                 
-                    <th>
-                        <font color="white">
-                            @Html.DisplayNameFor(model => model.MyTasks_asigned[0].Rating)
-                        </font>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.MyTasks_asigned)
-                {
-                    <tr>
-                        <td>
-                            <font color="white">
-                                @Html.DisplayFor(modelItem => item.Description)
-                            </font>
-                        </td>
-                   
-                        <td>
-                            <font color="white">
-                                @Html.DisplayFor(modelItem => item.Tag)
-                            </font>
-                        </td>
-                        <td>
-                            <font color="white">
-                                @Html.DisplayFor(modelItem => item.RatingFloat) <img src="~/Content/Images/star.png" width="22" height="22" />
-                            </font>
-                        </td>
-                        <td>
-
-                            <a asp-controller="MyTasks" asp-action="Edit" asp-route-id="@item.Id" asp-route-from_dashboard="no"><font color="white">Edit |</font></a>
-                            <a asp-controller="MyTasks" asp-action="Details" asp-route-id="@item.Id"><font color="white">Details |</font></a>
-                            <a asp-controller="MyTasks" asp-action="Delete" asp-route-id="@item.Id"><font color="white">Delete</font></a>
-
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-        <p><font color="white">Owner of</font></p>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>
-                        <font color="white">
-                            @Html.DisplayNameFor(model => model.MyTasks_owner[0].Description)
-                        </font>
-                    </th>                 
-                    <th>
-                        <font color="white">
-                            @Html.DisplayNameFor(model => model.MyTasks_owner[0].Tag)
-                        </font>
-                    </th>                   
-                    <th>
-                        <font color="white">
-                            @Html.DisplayNameFor(model => model.MyTasks_owner[0].Rating)
-                        </font>
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.MyTasks_owner)
-                {
-                    <tr>
-                        <td>
-                            <font color="white">
-                                @Html.DisplayFor(modelItem => item.Description)
-                            </font>
-                        </td>                       
-                        <td>
-                            <font color="white">
-                                @Html.DisplayFor(modelItem => item.Tag)
-                            </font>
-                        </td>
-                        <td>
-                            <font color="white">
-                                @Html.DisplayFor(modelItem => item.RatingFloat) <img src="~/Content/Images/star.png" width="22" height="22" />
-                            </font>
-                        </td>
-                        <td>
-
-                            <a asp-controller="MyTasks" asp-action="Edit" asp-route-id="@item.Id" asp-route-from_dashboard="no"><font color="white">Edit |</font></a>
-                            <a asp-controller="MyTasks" asp-action="Details" asp-route-id="@item.Id"><font color="white">Details |</font></a>
-                            <a asp-controller="MyTasks" asp-action="Delete" asp-route-id="@item.Id"><font color="white">Delete</font></a>
-
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <div class="divRight">
+            <img src="~/Content/Images/bianca.jpg" width="240" height="320" align="middle">
+        </div>
     </div>
-    <div>
-        <a asp-action="Edit" asp-route-id="@Model.Id"><font color="white">Edit |</font></a>
-        <a asp-action="Index"><font color="white">Back to List</font></a>
+    <hr/>
+    <div class="row">
+        <div class="divFull"> 
+            <p><font color="antiquewhite">Assigned to</font></p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            <font color="antiquewhite">
+                                @Html.DisplayNameFor(model => model.MyTasks_asigned[0].Description)
+                            </font>
+                        </th>
+                        <th>
+                            <font color="antiquewhite">
+                                @Html.DisplayNameFor(model => model.MyTasks_asigned[0].Tag)
+                            </font>
+                        </th>
+                        <th>
+                            <font color="antiquewhite">
+                                @Html.DisplayNameFor(model => model.MyTasks_asigned[0].Rating)
+                            </font>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.MyTasks_asigned)
+                    {
+                        <tr>
+                            <td>
+                                <font color="antiquewhite">
+                                    @Html.DisplayFor(modelItem => item.Description)
+                                </font>
+                            </td>
+
+                            <td>
+                                <font color="antiquewhite">
+                                    @Html.DisplayFor(modelItem => item.Tag)
+                                </font>
+                            </td>
+                            <td>
+                                <font color="antiquewhite">
+                                    @Html.DisplayFor(modelItem => item.RatingFloat) <img src="~/Content/Images/star.png" width="22" height="22" />
+                                </font>
+                            </td>
+                            <td>
+
+                                <a asp-controller="MyTasks" asp-action="Edit" asp-route-id="@item.Id" asp-route-from_dashboard="no"><font color="antiquewhite">Edit |</font></a>
+                                <a asp-controller="MyTasks" asp-action="Details" asp-route-id="@item.Id"><font color="antiquewhite">Details |</font></a>
+                                <a asp-controller="MyTasks" asp-action="Delete" asp-route-id="@item.Id"><font color="antiquewhite">Delete</font></a>
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p><font color="antiquewhite">Owner of</font></p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            <font color="antiquewhite">
+                                @Html.DisplayNameFor(model => model.MyTasks_owner[0].Description)
+                            </font>
+                        </th>
+                        <th>
+                            <font color="antiquewhite">
+                                @Html.DisplayNameFor(model => model.MyTasks_owner[0].Tag)
+                            </font>
+                        </th>
+                        <th>
+                            <font color="antiquewhite">
+                                @Html.DisplayNameFor(model => model.MyTasks_owner[0].Rating)
+                            </font>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.MyTasks_owner)
+                    {
+                        <tr>
+                            <td>
+                                <font color="antiquewhite">
+                                    @Html.DisplayFor(modelItem => item.Description)
+                                </font>
+                            </td>
+                            <td>
+                                <font color="antiquewhite">
+                                    @Html.DisplayFor(modelItem => item.Tag)
+                                </font>
+                            </td>
+                            <td>
+                                <font color="antiquewhite">
+                                    @Html.DisplayFor(modelItem => item.RatingFloat) <img src="~/Content/Images/star.png" width="22" height="22" />
+                                </font>
+                            </td>
+                            <td>
+
+                                <a asp-controller="MyTasks" asp-action="Edit" asp-route-id="@item.Id" asp-route-from_dashboard="no"><font color="antiquewhite">Edit |</font></a>
+                                <a asp-controller="MyTasks" asp-action="Details" asp-route-id="@item.Id"><font color="antiquewhite">Details |</font></a>
+                                <a asp-controller="MyTasks" asp-action="Delete" asp-route-id="@item.Id"><font color="antiquewhite">Delete</font></a>
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
+        <div class="divFull">
+            <a asp-action="Edit" asp-route-id="@Model.Id"><font color="antiquewhite">Edit |</font></a>
+            <a asp-action="Index"><font color="antiquewhite">Back to List</font></a>
+        </div>
 </body>

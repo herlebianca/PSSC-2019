@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Http;
 
 namespace MyPlanner.Models
 {
@@ -30,6 +33,8 @@ namespace MyPlanner.Models
         [Display(Name = "Email address")]
         public string email { get; set; }
         public string picture_path { get; set; }
+        [NotMapped]
+        public IFormFile PictureFile { get; set; }
         [Display(Name = "Rating")]
         public float rating_float { get; set; }
 
@@ -55,23 +60,26 @@ namespace MyPlanner.Models
             this.other_ocupation = "None";
             this.email = "None";
             this.picture_path = "None";
+            this.PictureFile = null;
             this.rating_float = 5;
             this.phone_number = "None";
             this.MyTasks_asigned = null;
             this.MyTasks_owner = null;
         }
-        public User(string first_name, string last_name, string username, string encrypted_password, int age=0, string other_ocupation=null, string email=null, string picture_path=null)
+        public User(string first_name, string last_name, string username, string encrypted_password, IFormFile PictureFile, int age=0, string other_ocupation=null, string email=null,string phone_number=null, string picture_path=null)
         {
             this.Id = new Guid();
             this.first_name = first_name;
+            this.last_name = last_name;
             this.username = username;
             this.encrypted_password = encrypted_password;
-            this.age = 0;
+            this.PictureFile = PictureFile;
+            this.age = age;
             this.other_ocupation = other_ocupation;
             this.email = email;
             this.phone_number = phone_number;
             this.rating_float = 5;
-            this.picture_path = picture_path;
+            this.picture_path = picture_path;            
             this.MyTasks_asigned = null;
             this.MyTasks_owner = null;
         }
