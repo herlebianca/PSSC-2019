@@ -170,12 +170,26 @@ namespace MyPlanner.Models
             set { this._rating = value; }
         }
 
-        private float _rating_float { get; set; }
+        private int _rating_int { get; set; }
         [Display(Name = "Rating")]
-        public float RatingFloat
+        public int RatingInt
         {
-            get { return this._rating_float; }
-            set { this._rating_float = value; }
+            get { return this._rating_int; }
+            set { this._rating_int = value; }
+        }
+        private RatingType _rating_own { get; set; }
+        public RatingType RatingOwn
+        {
+            get { return this._rating_own; }
+            set { this._rating_own = value; }
+        }
+
+        private int _rating_own_int { get; set; }
+        [Display(Name = "Rating for owner")]
+        public int RatingOwnInt
+        {
+            get { return this._rating_own_int; }
+            set { this._rating_own_int = value; }
         }
 
         public MyTask()
@@ -192,10 +206,12 @@ namespace MyPlanner.Models
             this._tag = TagType.Other;
             this._asignee_name = null;
             this._status = StatusType.NotStarted;
-            this._rating = RatingType.FiveStars;
-            this._rating_float = 5;
+            this._rating = RatingType.NoRating;
+            this._rating_int = 0;
+            this._rating_own = RatingType.NoRating;
+            this._rating_own_int = 0;
         }
-        public MyTask(string description, DateTime due_date, string owner_name, string location, HowUrgentType urgency, FakeBoolType transfer, int duration, FakeBoolType physical_effort, TagType tag, string asignee_name=null, RatingType rating=RatingType.FiveStars, StatusType status=StatusType.NotStarted)
+        public MyTask(string description, DateTime due_date, string owner_name, string location, HowUrgentType urgency, FakeBoolType transfer, int duration, FakeBoolType physical_effort, TagType tag, string asignee_name=null, RatingType rating=RatingType.NoRating, RatingType rating_own = RatingType.NoRating, StatusType status=StatusType.NotStarted)
         {
             this._id = new Guid();
             this._description     = description;
@@ -210,12 +226,15 @@ namespace MyPlanner.Models
             this._asignee_name    = asignee_name;
             this._status          = status;
             this._rating          = rating;
-            this._rating_float = 5;
+            this._rating_int      = (int)rating;
+            this._rating_own = rating;
+            this._rating_own_int = (int)rating_own;
         }
     }
     public enum RatingType
     {
-        
+        NoRating,
+
         OneStar,
        
         TwoStars,

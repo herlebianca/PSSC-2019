@@ -117,8 +117,10 @@ namespace MyPlanner.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Description,Due_Date,Owner,Location,Urgency,Transfer,Duration,Physical_Effort,Tag,Asignee,Status,Rating")] MyTask myTask)
+        public async Task<IActionResult> Edit(Guid id, string Description, DateTime Due_Date, string Owner, string Location,RatingType Rating, RatingType RatingOwn, MyTask.FakeBoolType Transfer,int Duration, MyTask.FakeBoolType Physical_Effort,MyTask.TagType Tag, string Asignee,MyTask.StatusType Status)
         {
+            var myTask = _context.MyTask.Find(id);
+
             if (id != myTask.Id)
             {
                 return NotFound();
@@ -126,9 +128,73 @@ namespace MyPlanner.Controllers
 
             if (ModelState.IsValid)
             {
+                var user_asgn = await _context.User.FirstOrDefaultAsync(m => m.username == myTask.Asignee);
+                var user_own = await _context.User.FirstOrDefaultAsync(m => m.username == myTask.Owner);
+                if (Description!=myTask.Description)
+                {
+                    myTask.Description = Description;
+                }
+                if(Due_Date!=myTask.Due_Date)
+                {
+                    myTask.Due_Date = Due_Date;
+                }
+                if(Owner!=myTask.Owner)
+                {
+                    myTask.Owner = Owner;
+                }
+                if(Location!=myTask.Location)
+                {
+                    myTask.Location = Location;
+                }    
+                if(Tag!=myTask.Tag)
+                {
+                    myTask.Tag = Tag;
+                }
+                if (Asignee != myTask.Asignee)
+                {
+                    myTask.Asignee = Asignee;
+                } 
+                if(Status!=myTask.Status)
+                {
+                    myTask.Status = Status;
+                }
+
+                if(Rating!= myTask.Rating)
+                {
+                    myTask.RatingInt = (int)myTask.Rating;
+                    myTask.Rating = Rating;
+                    myTask.RatingInt = (int)Rating;
+                    user_asgn.rating_float = (user_asgn.no_ratings * user_asgn.rating_float + myTask.RatingInt) / (user_asgn.no_ratings + 1);
+                    user_asgn.rating_float = (float)Math.Round(user_asgn.rating_float, 2);
+                    user_asgn.no_ratings = user_asgn.no_ratings + 1;
+                }
+                if (RatingOwn != myTask.RatingOwn)
+                {
+                    myTask.RatingOwnInt = (int)myTask.RatingOwn;
+                    myTask.RatingOwn = RatingOwn;
+                    myTask.RatingOwnInt = (int)RatingOwn;
+                    user_own.rating_float = (user_own.no_ratings * user_own.rating_float + myTask.RatingInt) / (user_own.no_ratings + 1);
+                    user_own.rating_float = (float)Math.Round(user_own.rating_float, 2);
+                    user_own.no_ratings = user_own.no_ratings + 1;
+                }
+
+                if (Transfer!=myTask.Transfer)
+                {
+                    myTask.Transfer = Transfer;
+                }
+                if(Duration!=myTask.Duration)
+                {
+                    myTask.Duration = Duration;
+                }
+                if(Physical_Effort!=myTask.Physical_Effort)
+                {
+                    myTask.Physical_Effort = Physical_Effort;
+                }
+
                 try
                 {
-                    _context.Update(myTask);
+                    _context.Update(user_asgn);
+                    _context.Update(myTask);                    
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

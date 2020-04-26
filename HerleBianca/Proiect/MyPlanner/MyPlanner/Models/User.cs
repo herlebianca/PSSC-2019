@@ -37,6 +37,7 @@ namespace MyPlanner.Models
         public IFormFile PictureFile { get; set; }
         [Display(Name = "Rating")]
         public float rating_float { get; set; }
+        public int no_ratings { get; set; }
 
         [Display(Name = "Phone number")]
         public string phone_number { get; set; }
@@ -62,6 +63,7 @@ namespace MyPlanner.Models
             this.picture_path = "None";
             this.PictureFile = null;
             this.rating_float = 5;
+            this.no_ratings = 0;
             this.phone_number = "None";
             this.MyTasks_asigned = null;
             this.MyTasks_owner = null;
@@ -82,6 +84,7 @@ namespace MyPlanner.Models
             this.picture_path = picture_path;            
             this.MyTasks_asigned = null;
             this.MyTasks_owner = null;
+            this.no_ratings = 0;
         }
     }
 }

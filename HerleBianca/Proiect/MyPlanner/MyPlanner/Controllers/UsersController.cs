@@ -41,18 +41,37 @@ namespace MyPlanner.Controllers
             }
 
             var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
-
-            var myTasks = from m in _context.MyTask select m;
-            var myTasks2 = from m in _context.MyTask select m;
-            myTasks = myTasks.Where(s => s.Asignee.Contains(user.username));
-            myTasks2 = myTasks.Where(s => s.Owner.Contains(user.username));
-            user.MyTasks_asigned = await myTasks.ToListAsync();
-            user.MyTasks_owner = await myTasks2.ToListAsync();
-
             if (user == null)
             {
                 return NotFound();
             }
+            var myTasks = from m in _context.MyTask select m;
+            var myTasks2 = from n in _context.MyTask select n;
+            myTasks = myTasks.Where(s => s.Asignee.Contains(user.username));
+            myTasks2 = myTasks2.Where(x => x.Owner.Contains(user.username));
+            user.MyTasks_asigned = await myTasks.ToListAsync();
+            user.MyTasks_owner = await myTasks2.ToListAsync();           
+
+            return View(user);
+        }
+        // GET: Users/Details/5
+        public async Task<IActionResult> MyProfile(Guid? id)
+        {
+            if (logged_user == null)
+                return RedirectToAction("Privacy", "Home"); //Privacy is used as default empty page
+            id = logged_user.Id;
+
+            var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var myTasks = from m in _context.MyTask select m;
+            var myTasks2 = from n in _context.MyTask select n;
+            myTasks = myTasks.Where(s => s.Asignee.Contains(user.username));
+            myTasks2 = myTasks2.Where(x => x.Owner.Contains(user.username));
+            user.MyTasks_asigned = await myTasks.ToListAsync();
+            user.MyTasks_owner = await myTasks2.ToListAsync();         
 
             return View(user);
         }
@@ -116,38 +135,38 @@ namespace MyPlanner.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("id,first_name,last_name,username,PictureFile,encrypted_password,age,other_ocupation,email,picture_path,rating,phone_number")] User user)
+        public async Task<IActionResult> Edit(Guid Id,string first_name,string last_name,string username,string encrypted_password,IFormFile PictureFile,int age,string other_ocupation,string email,string picture_path,RatingType rating,string phone_number)
         {            
         if (ModelState.IsValid)
-         {
+        {
              try
              {                 
-                 if(logged_user.username == user.username)
-                    {
+                 if(logged_user.username == username)
+                 {
                         var updated = _context.User.Find(logged_user.Id);
-                        if(user.PictureFile != null)
+                        if(PictureFile != null)
                         {
-                            string fileName = Path.GetFileNameWithoutExtension(user.PictureFile.FileName);
-                            string extension = Path.GetExtension(user.PictureFile.FileName);
+                            string fileName = Path.GetFileNameWithoutExtension(PictureFile.FileName);
+                            string extension = Path.GetExtension(PictureFile.FileName);
                             fileName = fileName + DateTime.Now.ToString("yymmssffff") + extension;
                             //user.picture_path = "~/Content/Images/" + fileName;
                             updated.picture_path = "C:/Users/bherle/source/repos/MyPlanner/MyPlanner/wwwroot/Content/Images/" + fileName;
-                            updated.PictureFile.CopyTo(new FileStream(user.picture_path, FileMode.Create));
+                            updated.PictureFile.CopyTo(new FileStream(picture_path, FileMode.Create));
                         }
-                        updated.first_name = user.first_name;
-                        updated.last_name = user.last_name;
-                        updated.username = user.username;
-                        updated.age = user.age;
-                        updated.other_ocupation = user.other_ocupation;
-                        updated.phone_number = user.phone_number;
-                        updated.email = user.email;
+                        updated.first_name = first_name;
+                        updated.last_name = last_name;
+                        updated.username = username;
+                        updated.age = age;
+                        updated.other_ocupation = other_ocupation;
+                        updated.phone_number = phone_number;
+                        updated.email = email;
                         _context.Update(updated);
                         await _context.SaveChangesAsync();
-                    }                
+                 }                
              }
              catch (DbUpdateConcurrencyException)
              {
-                 if (!UserExists(user.Id))
+                 if (!UserExists(Id))
                  {
                      return NotFound();
                  }
@@ -159,7 +178,7 @@ namespace MyPlanner.Controllers
              ViewBag.Message = string.Format("Your changes have been saved");
              return RedirectToAction(nameof(Index));
          }
-            return View(user);
+            return View(logged_user);
         }
 
         // GET: Users/Delete/5

@@ -1,28 +1,33 @@
 ﻿@model MyPlanner.Models.User
 
 @{
-    ViewData["Title"] = "Profile";
+    ViewData["Title"] = "My Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 <style>
     body {
         background: #1d9172;
         color: antiquewhite;
     }
+
     .divLeft {
-        width:70%;
+        width: 70%;
         float: left;
     }
+
     .divRight {
-        width:30%;
+        width: 30%;
         float: right;
     }
+
     .divFull {
-        width:100%;
+        width: 100%;
     }
 </style>
 <h1><font color="antiquewhite">Profile</font></h1>
-<body >
-    <hr/>
+<body>
+    <hr />
     <div class="row">
         <div class="divLeft">
             <dl class="row">
@@ -78,12 +83,12 @@
         </div>
 
         <div class="divRight">
-            <img src="@Html.DisplayFor(model => model.picture_path)" width="240" height="320" align="middle">
+            <img src="@Url.Content(@Model.picture_path)" width="240" height="320" align="middle">
         </div>
     </div>
-    <hr/>
+    <hr />
     <div class="row">
-        <div class="col-sm-8"> 
+        <div class="col-sm-8">
             <p><font color="antiquewhite">Assigned to</font></p>
             <table class="table">
                 <thead>
@@ -149,7 +154,7 @@
                         </th>
                         <th>
                             <font color="antiquewhite">
-                                @Html.DisplayNameFor(model => model.MyTasks_owner[0].RatingInt) 
+                                @Html.DisplayNameFor(model => model.MyTasks_owner[0].RatingInt)
                             </font>
                         </th>
                         <th></th>
@@ -180,8 +185,8 @@
             </table>
         </div>
     </div>
-        <div class="divFull">
-            <a asp-action="Edit" asp-route-id="@Model.Id"><font color="antiquewhite">Edit |</font></a>
-            <a asp-action="Index"><font color="antiquewhite">Back to List</font></a>
-        </div>
+    <div class="divFull">
+        <a asp-action="Edit" asp-route-id="@Model.Id"><font color="antiquewhite">Edit |</font></a>
+        <a asp-action="Index"><font color="antiquewhite">Back to List</font></a>
+    </div>
 </body>

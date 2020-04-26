@@ -58,7 +58,7 @@
                         <p>Tag: @Html.DisplayFor(modelItem => item.Tag)</p>
                         <p>Asignee: @Html.DisplayFor(modelItem => item.Asignee)</p>
                         <p>Status: @Html.DisplayFor(modelItem => item.Status)</p>
-                        <p>Rating: @Html.DisplayFor(modelItem => item.RatingFloat) <img src="~/Content/Images/star.png" width="22" height="22" /></p>
+                        <p>Rating: @Html.DisplayFor(modelItem => item.RatingInt) <img src="~/Content/Images/star.png" width="22" height="22" /></p>
                     <p>
                         <a asp-controller="MyTasks" asp-action="Edit" asp-route-id="@item.Id" asp-route-from_dashboard="no"><font color="white">Edit |</font></a>
                         <a asp-controller="MyTasks" asp-action="Details" asp-route-id="@item.Id"><font color="white">Details |</font></a>
