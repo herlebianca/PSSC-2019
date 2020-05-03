@@ -120,6 +120,7 @@ namespace MyPlanner.Controllers
         public async Task<IActionResult> Edit(Guid id, string Description, DateTime Due_Date, string Owner, string Location,RatingType Rating, RatingType RatingOwn, MyTask.FakeBoolType Transfer,int Duration, MyTask.FakeBoolType Physical_Effort,MyTask.TagType Tag, string Asignee,MyTask.StatusType Status)
         {
             var myTask = _context.MyTask.Find(id);
+            var msg_err = false;
 
             if (id != myTask.Id)
             {
@@ -159,7 +160,7 @@ namespace MyPlanner.Controllers
                     myTask.Status = Status;
                 }
 
-                if(Rating!= myTask.Rating)
+                if(myTask.Rating == RatingType.NoRating)
                 {
                     myTask.RatingInt = (int)myTask.Rating;
                     myTask.Rating = Rating;
@@ -168,7 +169,12 @@ namespace MyPlanner.Controllers
                     user_asgn.rating_float = (float)Math.Round(user_asgn.rating_float, 2);
                     user_asgn.no_ratings = user_asgn.no_ratings + 1;
                 }
-                if (RatingOwn != myTask.RatingOwn)
+                else
+                {
+                    ViewBag.Message = string.Format("Rating cannot be changed");
+                    msg_err = true;
+                }
+                if (myTask.RatingOwn == RatingType.NoRating)
                 {
                     myTask.RatingOwnInt = (int)myTask.RatingOwn;
                     myTask.RatingOwn = RatingOwn;
@@ -177,7 +183,11 @@ namespace MyPlanner.Controllers
                     user_own.rating_float = (float)Math.Round(user_own.rating_float, 2);
                     user_own.no_ratings = user_own.no_ratings + 1;
                 }
-
+                else
+                {
+                    ViewBag.Message = string.Format("Rating cannot be changed");
+                    msg_err = true;
+                }
                 if (Transfer!=myTask.Transfer)
                 {
                     myTask.Transfer = Transfer;
@@ -210,7 +220,8 @@ namespace MyPlanner.Controllers
                 }
                 //return RedirectToAction("Dashboard", "Users", UsersController.logged_user);
                 //return RedirectToAction("Index");
-                ViewBag.Message = string.Format("Your changes have been saved");
+                if(!msg_err)
+                    ViewBag.Message = string.Format("Your changes have been saved");
                 
             }
             return View(myTask);

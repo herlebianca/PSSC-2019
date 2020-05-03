@@ -16,5 +16,6 @@ namespace MyPlanner.Data
 
         public DbSet<MyPlanner.Models.MyTask> MyTask { get; set; }
         public DbSet<MyPlanner.Models.User> User { get; set; }
+        public DbSet<MyPlanner.Models.Message> Message { get; set; }
     }
 }

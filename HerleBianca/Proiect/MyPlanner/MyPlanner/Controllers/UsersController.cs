@@ -10,6 +10,7 @@ using MyPlanner.Data;
 using MyPlanner.Models;
 using MyPlanner.Repository;
 using Microsoft.AspNetCore.Http;
+using System.Web;
 
 namespace MyPlanner.Controllers
 {
@@ -20,6 +21,7 @@ namespace MyPlanner.Controllers
         public UsersController(MyPlannerContext context)
         {
             _context = context;           
+            logged_user = _context.User.FirstOrDefault(m => m.username == "bianca_alexandra"); //To ease testing REMOVE LATER!!!
         }
 
         // GET: Users
@@ -35,11 +37,11 @@ namespace MyPlanner.Controllers
         {
             if(logged_user==null)
                 return RedirectToAction("Privacy", "Home"); //Privacy is used as default empty page
-            if (id == null)
+          /*  if (id == null)
             {
                 id = logged_user.Id;
             }
-
+            */
             var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
             if (user == null)
             {
@@ -237,8 +239,11 @@ namespace MyPlanner.Controllers
                 if (user != null)
                 {
                     if (SecurePasswordHasherHelper.Verify(objUser.encrypted_password, user.encrypted_password))
+                    {
                         logged_user = user;
-                        return RedirectToAction("Dashboard", logged_user);
+                    }                       
+                                           
+                    return RedirectToAction("Dashboard", logged_user);
                         
                 }
                 
@@ -246,6 +251,14 @@ namespace MyPlanner.Controllers
             ViewBag.Message = string.Format("Incorrect username or password");
             return View("Login",objUser);
         }
+
+        //GET: Login
+        public ActionResult Logout()
+        {
+            logged_user = null;
+            return RedirectToAction("Index", "Home");
+        }
+
         //GET : Dashboard
         public async Task<IActionResult> Dashboard(string name)
         {
