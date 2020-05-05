@@ -25,6 +25,7 @@ namespace MyPlanner.Controllers
         public ChatController(MyPlannerContext context)
         {
             _context = context;
+            UsersController.logged_user = _context.User.FirstOrDefault(m => m.username == "bianca_alexandra");
             conv_model = new ConversationViewModel();
             var options = new PusherOptions
             {
@@ -36,9 +37,10 @@ namespace MyPlanner.Controllers
               "8aca8df20d212d21054b",
               "0f381668084a9cffe7f5",
               options);
-            UsersController.logged_user = _context.User.FirstOrDefault(m => m.username == "bianca_alexandra"); //To ease testing REMOVE LATER!!!
+            
         }
-        public async Task<ActionResult> Index(string contact, string selected_contact, string message_text)
+       
+        public async Task<ActionResult> Index(string contact, string selected_contact, string message_text, string new_received, string contact_received)
         {
             /*  var result = await pusher.TriggerAsync(
                  "my-channel",
@@ -105,7 +107,8 @@ namespace MyPlanner.Controllers
             }
             if(!string.IsNullOrEmpty(temp_contact))
             {
-                 IQueryable<Message> convQuery3 = from p in _context.Message
+                conv_model.receive_channel = temp_contact;
+                IQueryable<Message> convQuery3 = from p in _context.Message
                                                  orderby p.Date_created
                                                  where (p.Receiver == temp_contact && p.Sender == UsersController.logged_user.username) || (p.Receiver == UsersController.logged_user.username && p.Sender == temp_contact)
                                                  select p;
@@ -120,23 +123,42 @@ namespace MyPlanner.Controllers
                     
                 }
             }
-            if(!string.IsNullOrEmpty(message_text))
+            conv_model.send_channel = UsersController.logged_user.username;
+            
+
+            if (!string.IsNullOrEmpty(message_text))
             {
                 
                 Message message_send = new Message(last_id + 1, UsersController.logged_user.username, temp_contact, DateTime.Now,message_text);
                 try
                 {
-                   _context.Add(message_send);
+                    conv_model.messages.Add(new Text(message_send.Text, "sent", message_send.Date_created));                   
+                    var result = await pusher.TriggerAsync(
+                                    conv_model.send_channel,
+                                    "my-event",
+                                new { message = message_text });
+
+                    _context.Add(message_send);
                     await _context.SaveChangesAsync();
                     ModelState.Clear();
-                    last_id = last_id + 1;
+                    last_id += 1;
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     return (RedirectToAction("Index", "Home"));
                 }
             }
-           
+           if (!string.IsNullOrEmpty(new_received) && !string.IsNullOrEmpty(contact_received))
+            {
+                last_id = last_id + 1;
+                Message message_receive = new Message(last_id + 1, contact_received, UsersController.logged_user.username, DateTime.Now, new_received);
+                conv_model.messages.Add(new Text(message_receive.Text, "received", message_receive.Date_created));
+                conv_model.new_received = new_received;
+                _context.Add(message_receive);
+                await _context.SaveChangesAsync();
+               // ModelState.Clear();
+                return View(conv_model);
+            }
             return View(conv_model);
 
         }

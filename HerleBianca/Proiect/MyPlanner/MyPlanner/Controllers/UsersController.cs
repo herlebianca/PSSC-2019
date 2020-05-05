@@ -20,8 +20,8 @@ namespace MyPlanner.Controllers
         public static User logged_user;
         public UsersController(MyPlannerContext context)
         {
-            _context = context;           
-            logged_user = _context.User.FirstOrDefault(m => m.username == "bianca_alexandra"); //To ease testing REMOVE LATER!!!
+            _context = context;
+            logged_user = _context.User.FirstOrDefault(m => m.username == "bianca_alexandra"); 
         }
 
         // GET: Users

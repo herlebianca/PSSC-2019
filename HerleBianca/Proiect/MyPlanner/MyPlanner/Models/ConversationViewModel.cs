@@ -57,6 +57,9 @@ namespace MyPlanner.Models
         public string Contact { get; set; }
         public string Selected_Contact { get; set; }
         public string Message_Text { get; set; }
-
+        public string send_channel { get; set; }
+        public string receive_channel { get; set; }
+        public string new_received { get; set; }
+        public string contact_received { get; set; }
     }
 }
