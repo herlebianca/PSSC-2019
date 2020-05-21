@@ -10,10 +10,10 @@ using MyPlanner.Controllers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MyPlanner.Tests
-{
+{/*
     [TestFixture]
     public class UserControllerTest
-    {  /*
+    {  
         [Test]
         [Category("pass")]
         public void IndexShouldWork()
@@ -76,6 +76,6 @@ namespace MyPlanner.Tests
             Assert.IsInstanceOf(typeof(User),model);
             var objUser = (User)model;            
             Assert.AreEqual("test_username", objUser.username);
-        }*/
-    }
+        }
+    } */
 }

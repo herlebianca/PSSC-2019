@@ -121,7 +121,7 @@ namespace MyPlanner.Controllers
         {
             var myTask = _context.MyTask.Find(id);
             var msg_err = false;
-
+            
             if (id != myTask.Id)
             {
                 return NotFound();
@@ -129,8 +129,8 @@ namespace MyPlanner.Controllers
 
             if (ModelState.IsValid)
             {
-                var user_asgn = await _context.User.FirstOrDefaultAsync(m => m.username == myTask.Asignee);
-                var user_own = await _context.User.FirstOrDefaultAsync(m => m.username == myTask.Owner);
+                var user_asgn = _context.User.FirstOrDefault(m => m.username == Asignee);
+                var user_own = await _context.User.FirstOrDefaultAsync(n => n.username == Owner);
                 if (Description!=myTask.Description)
                 {
                     myTask.Description = Description;
@@ -160,34 +160,32 @@ namespace MyPlanner.Controllers
                     myTask.Status = Status;
                 }
 
-                if(myTask.Rating == RatingType.NoRating)
-                {
-                    myTask.RatingInt = (int)myTask.Rating;
+                if(Rating != RatingType.NoRating)
+                {                
                     myTask.Rating = Rating;
                     myTask.RatingInt = (int)Rating;
-                    user_asgn.rating_float = (user_asgn.no_ratings * user_asgn.rating_float + myTask.RatingInt) / (user_asgn.no_ratings + 1);
+                    user_asgn.rating_float = (user_asgn.no_ratings * user_asgn.rating_float + (int)Rating) / (user_asgn.no_ratings + 1);
                     user_asgn.rating_float = (float)Math.Round(user_asgn.rating_float, 2);
                     user_asgn.no_ratings = user_asgn.no_ratings + 1;
                 }
-                else
+               /* else
                 {
                     ViewBag.Message = string.Format("Rating cannot be changed");
                     msg_err = true;
-                }
-                if (myTask.RatingOwn == RatingType.NoRating)
+                }*/
+                if (RatingOwn != RatingType.NoRating)
                 {
-                    myTask.RatingOwnInt = (int)myTask.RatingOwn;
                     myTask.RatingOwn = RatingOwn;
                     myTask.RatingOwnInt = (int)RatingOwn;
-                    user_own.rating_float = (user_own.no_ratings * user_own.rating_float + myTask.RatingInt) / (user_own.no_ratings + 1);
+                    user_own.rating_float = (user_own.no_ratings * user_own.rating_float + (int)RatingOwn) / (user_own.no_ratings + 1);
                     user_own.rating_float = (float)Math.Round(user_own.rating_float, 2);
                     user_own.no_ratings = user_own.no_ratings + 1;
                 }
-                else
+              /*  else
                 {
                     ViewBag.Message = string.Format("Rating cannot be changed");
                     msg_err = true;
-                }
+                } */
                 if (Transfer!=myTask.Transfer)
                 {
                     myTask.Transfer = Transfer;
@@ -203,7 +201,8 @@ namespace MyPlanner.Controllers
 
                 try
                 {
-                    _context.Update(user_asgn);
+                    if(user_asgn!=null)
+                        _context.Update(user_asgn);
                     _context.Update(myTask);                    
                     await _context.SaveChangesAsync();
                 }

@@ -54,9 +54,7 @@
                         <p> Rating: @Html.DisplayFor(modelItem => item.rating_float) <img src="~/Content/Images/star.png" width="22" height="22" /> </p>
 
                         <p>
-                            <a asp-action="Edit" asp-route-id="@item.Id"><font color="white">Edit |</font></a>
-                            <a asp-action="Details" asp-route-id="@item.Id"><font color="white">Profile |</font></a>
-                            <a asp-action="Delete" asp-route-id="@item.Id"><font color="white">Delete</font></a>
+                            <a asp-action="Details" asp-route-id="@item.Id"><font color="white">See Profile</font></a>                            
                         </p>
                     </font>
                 </div>

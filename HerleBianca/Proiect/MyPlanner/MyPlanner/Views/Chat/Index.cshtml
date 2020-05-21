@@ -243,7 +243,7 @@
                         <div class="recent_heading">
                             <h4><a>@Html.ActionLink("Recent", "Index", "Chat")</a></h4>
                         </div>
-                        <form asp-controller="Chat" asp-action="Index" >
+                        <form asp-controller="Chat" asp-action="Index" autocomplete="off" >
                             <div class="srch_bar">
                                 <div class="stylish-input-group">
                                     <input type="text" asp-for="Contact" class="search-bar" placeholder="Search">
@@ -312,15 +312,26 @@
                                     <div class="received_withd_msg">
                                         <p>
                                             @Html.DisplayFor(model => Model.new_received)
-                                        </p>                                        
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         }
-                        
+
                         <script src="https://js.pusher.com/6.0/pusher.min.js"></script>
                         <script>
-
+                       
+                            <div class="received_msg">
+                                <div class="received_withd_msg">
+                                    <p id="msg">
+                                    </p>
+                                </div>
+                            </div>
+                            
+                        </script>
+                 
+                        <script>
+                            
                             // Enable pusher logging - don't include this in production
                             Pusher.logToConsole = true;
 
@@ -329,16 +340,16 @@
                             });
 
                             var channel = pusher.subscribe('my-channel');
+    
                             channel.bind('my-event', function (data) {
-                                alert('Received new message from ' + data.name + ' : ' + data.message);  
-                                $.get("@Url.Action("Index","Chat")", { new_received: data.message, contact_received: data.name });                                                                                                  
-                                
+                                alert('Received new message from ' + data.name + ' : ' + data.message);                                                               
+                                $.post("@Url.Action("Index","Chat")", { new_received: data.message, contact_received: data.name });
                             });
                            
                         </script>
 
                     </div>
-                    <form asp-controller="Chat" asp-action="Index">
+                    <form asp-controller="Chat" asp-action="Index" autocomplete="off">
                         <div class="type_msg">
                             <div class="input_msg_write">
                                 <input type="text" asp-for="Message_Text" class="write_msg" placeholder="Type a message" />

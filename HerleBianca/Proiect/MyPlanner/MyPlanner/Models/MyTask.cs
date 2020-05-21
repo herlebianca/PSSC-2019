@@ -230,6 +230,75 @@ namespace MyPlanner.Models
             this._rating_own = rating;
             this._rating_own_int = (int)rating_own;
         }
+        private int SuggestedPrice()
+        {
+            float suggested_price=0;
+            //weights will be read from the db
+            float w1 = 0;
+            float w2 = 0;
+            float w3 = 0;
+            float w4 = 0;
+            //parameters
+            float p1, p2, p3, p4;
+            // scale with a step of 0.2 , as there are 6 values of the enum, last one gets 0
+            switch (this.Urgency)
+            {
+                case HowUrgentType.Today:
+                    p1 = 1;
+                    break;
+                case HowUrgentType.Tomorrow:
+                    p1 = 0.8F;
+                    break;
+                case HowUrgentType.This_week:
+                    p1 = 0.6F;
+                    break;
+                case HowUrgentType.Next_week:
+                    p1 = 0.4F;
+                    break;
+                case HowUrgentType.This_month:
+                    p1 = 0.2F;
+                    break;
+                case HowUrgentType.Anytime:
+                    p1 = 0;
+                    break;
+                default:
+                    p1 = 0;
+                    break;
+            }
+            switch (this.Transfer)
+            {
+                case FakeBoolType.Yes:
+                    p2 = 1;
+                    break;
+                case FakeBoolType.No:
+                    p2 = 0;
+                    break;
+                default:
+                    p2 = 0;
+                    break;
+            }
+            p3 = this.Duration; // price will be directly proportional with number of working hours
+            switch (this.Physical_Effort)
+            {
+                case FakeBoolType.Yes:
+                    p4 = 1;
+                    break;
+                case FakeBoolType.No:
+                    p4 = 0;
+                    break;
+                default:
+                    p4 = 0;
+                    break;
+            }
+            suggested_price = p1 * w1 + p2 * w2 + p3 * w3 + p4 * w4;
+
+            int final_price = (int)Math.Round(suggested_price);
+            return final_price;
+        }
+        private void update_weights()
+        {
+
+        }
     }
     public enum RatingType
     {
@@ -245,4 +314,5 @@ namespace MyPlanner.Models
        
         FiveStars
     }
+   
 }

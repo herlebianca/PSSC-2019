@@ -25,7 +25,7 @@ namespace MyPlanner.Controllers
         public ChatController(MyPlannerContext context)
         {
             _context = context;
-            UsersController.logged_user = _context.User.FirstOrDefault(m => m.username == "bianca_alexandra");
+            //UsersController.logged_user = _context.User.FirstOrDefault(m => m.username == "bianca_alexandra");
             conv_model = new ConversationViewModel();
             var options = new PusherOptions
             {

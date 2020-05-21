@@ -280,12 +280,13 @@ namespace MyPlanner.Controllers
                 name = logged_user.username;
             }
 
-            myTasks = myTasks.Where(x => x.Asignee == name);
-
-              var myTaskAsigneeVM = new MyTaskAsigneeViewModel
+            myTasks = myTasks.Where(x => x.Asignee == name || x.Owner==name);            
+       
+            var myTaskAsigneeVM = new MyTaskAsigneeViewModel
               {
                   Asignees = new SelectList(await asigneeQuery.Distinct().ToListAsync()),
                   MyTasks = await myTasks.ToListAsync()
+                  
               };
               
             return View(myTaskAsigneeVM);
