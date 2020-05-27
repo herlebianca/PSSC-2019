@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using MyPlanner.Data;
 
 namespace MyPlanner.Models
 {
@@ -192,6 +193,17 @@ namespace MyPlanner.Models
             set { this._rating_own_int = value; }
         }
 
+        public float Price { get; set; }
+
+        //Inputs for the suggest_price function
+        private float x1;
+        private float x2;
+        private float x3;
+        //Activations 
+        float a1;
+        float a2;
+
+        static float learning_rate =0.01F;
         public MyTask()
         {
             this._id = new Guid();
@@ -230,74 +242,118 @@ namespace MyPlanner.Models
             this._rating_own = rating;
             this._rating_own_int = (int)rating_own;
         }
-        private int SuggestedPrice()
+        private float ReLU(float x)
         {
-            float suggested_price=0;
-            //weights will be read from the db
-            float w1 = 0;
-            float w2 = 0;
-            float w3 = 0;
-            float w4 = 0;
-            //parameters
-            float p1, p2, p3, p4;
+            if (x < 0)
+                return 0;
+            else
+                return x;
+        }
+        public int SuggestedPrice(float b0, float b1, float w0_1, float w0_2, float w0_3, float w1_1)
+        {/*                        biases             | weights                                      */
+            
             // scale with a step of 0.2 , as there are 6 values of the enum, last one gets 0
             switch (this.Urgency)
             {
                 case HowUrgentType.Today:
-                    p1 = 1;
+                    x1 = 1;
                     break;
                 case HowUrgentType.Tomorrow:
-                    p1 = 0.8F;
+                    x1 = 0.8F;
                     break;
                 case HowUrgentType.This_week:
-                    p1 = 0.6F;
+                    x1 = 0.6F;
                     break;
                 case HowUrgentType.Next_week:
-                    p1 = 0.4F;
+                    x1 = 0.4F;
                     break;
                 case HowUrgentType.This_month:
-                    p1 = 0.2F;
+                    x1 = 0.2F;
                     break;
                 case HowUrgentType.Anytime:
-                    p1 = 0;
+                    x1 = 0;
                     break;
                 default:
-                    p1 = 0;
+                    x1 = 0;
                     break;
             }
             switch (this.Transfer)
             {
                 case FakeBoolType.Yes:
-                    p2 = 1;
+                    x2 = 1;
                     break;
                 case FakeBoolType.No:
-                    p2 = 0;
+                    x2 = 0;
                     break;
                 default:
-                    p2 = 0;
+                    x2 = 0;
                     break;
             }
-            p3 = this.Duration; // price will be directly proportional with number of working hours
+            
             switch (this.Physical_Effort)
             {
                 case FakeBoolType.Yes:
-                    p4 = 1;
+                    x3 = 1;
                     break;
                 case FakeBoolType.No:
-                    p4 = 0;
+                    x3 = 0;
                     break;
                 default:
-                    p4 = 0;
+                    x3 = 0;
                     break;
             }
-            suggested_price = p1 * w1 + p2 * w2 + p3 * w3 + p4 * w4;
-
-            int final_price = (int)Math.Round(suggested_price);
-            return final_price;
+     
+            a1 = ReLU(w0_1 * x1 + w0_2 * x2 + w0_3 * x3) + b0; //first layer
+            a2 = ReLU(w1_1 * a1) + b1; //second layer = final prediction            
+            int suggested_price = (int)Math.Round(a2) * this.Duration;
+            return suggested_price;
         }
-        private void update_weights()
+        public void BackPropagation(float b0_t0, float b1_t0, float w0_1_t0, float w0_2_t0, float w0_3_t0, float w1_1_t0, float actual_price,string location, MyPlannerContext _context,int weights_id, int weights_location_id, MyTask.TagType tag)
         {
+            float b0_t1 = b0_t0; //updated biases
+            float b1_t1 = b1_t0;
+            float w0_1_t1 = w0_1_t0; //updated weights;
+            float w0_2_t1 = w0_2_t0;
+            float w0_3_t1 = w0_3_t0;
+            float w1_1_t1 = w1_1_t0; 
+            int n = 0;
+            float temp_correction_b0 =0;
+            actual_price = actual_price / this.Duration;
+            //Derivative of cost with respect to weights for second layer
+            if (w1_1_t0 * a1 + b1_t0 > 0)
+                w1_1_t1 -= (learning_rate* 2 * (w1_1_t0 * a1 + b1_t0 - actual_price) * a1); 
+            // Derivative of cost with respect to biases for second layer
+            if (w1_1_t0 * a1 + b1_t0 >0 )
+                b1_t1 -=(learning_rate *2 * (w1_1_t0 * a1 + b1_t0 - actual_price)); 
+            //Derivative of cost with respect to weights for first layer
+            if (w0_1_t0 * x1 + b0_t0 > 0)
+                w0_1_t1 -= (learning_rate * 2 * (w0_1_t0 * x1 + b0_t0 - ((actual_price-b1_t0)/w1_1_t0) ) * x1 * w1_1_t0); 
+            if (w0_2_t0 * x2 + b0_t0 > 0)
+                w0_2_t1 -= (learning_rate * 2 * (w0_2_t0 * x2 + b0_t0 - ((actual_price - b1_t0) / w1_1_t0)) * x2 * w1_1_t0);
+            if (w0_3_t0 * x3 + b0_t0 > 0)
+                w0_3_t1 -=  (learning_rate * 2 * (w0_3_t0 * x3 + b0_t0 - ((actual_price - b1_t0) / w1_1_t0)) * x3 * w1_1_t0);
+            // Derivative of cost with respect to biases for first layer
+            if (w0_1_t0 * x1 + b0_t0 > 0)
+            {
+                temp_correction_b0-=(learning_rate * 2 * (w0_1_t0 * x1 + b0_t0 - (actual_price - b1_t0) / w1_1_t0));
+                n += 1;
+            }
+            if (w0_2_t0 * x2 + b0_t0 > 0)
+            {
+                temp_correction_b0 -= (learning_rate * 2 * (w0_2_t0 * x2 + b0_t0 - (actual_price - b1_t0) / w1_1_t0));
+                n += 1;
+            }
+            if (w0_3_t0 * x3 + b0_t0 > 0)
+            {
+                temp_correction_b0 -= (learning_rate * 2 * (w0_3_t0 * x3 + b0_t0 - (actual_price - b1_t0) / w1_1_t0));
+                n += 1;
+            }
+            b0_t1 += temp_correction_b0 / n;
 
+            Weights weights_t1 = new Weights(weights_id+1,w0_1_t1, w0_2_t1, w0_3_t1, b0_t1, b1_t1,tag);
+            LocationWeights location_weights_t1 = new LocationWeights(weights_location_id + 1,w1_1_t1, location,tag);
+            _context.Add(weights_t1);
+            _context.Add(location_weights_t1);
         }
     }
     public enum RatingType

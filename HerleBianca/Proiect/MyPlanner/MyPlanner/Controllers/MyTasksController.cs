@@ -28,13 +28,14 @@ namespace MyPlanner.Controllers
             {
                 return RedirectToAction("Privacy", "Home");
             }
-            
+
             IQueryable<MyTask.TagType> tagsQuery = from m in _context.MyTask
-                                            orderby m.Tag
-                                            select m.Tag;
+                                                   orderby m.Tag
+                                                   select m.Tag;
+                                            
 
             var myTasks = from m in _context.MyTask select m;
-
+            myTasks = myTasks.Where(asgn => asgn.Asignee == null);
             if (!string.IsNullOrEmpty(location))
             {
                 myTasks = myTasks.Where(s => s.Location.Contains(location));
@@ -86,11 +87,31 @@ namespace MyPlanner.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Description,Due_Date,Owner,Location,Urgency,Transfer,Duration,Physical_Effort,Tag,Asignee,Status,Rating")] MyTask myTask)
         {
+            Weights weights;
+            LocationWeights location_weights;
             if (ModelState.IsValid)
             {
                 myTask.Id = Guid.NewGuid();
+
+                IQueryable<Weights> weightsQuery = from w in _context.Weights
+                                                 select w;
+                var temp_weights = new List<Weights>(await weightsQuery.ToListAsync());
+                weights = temp_weights.Last(cat => cat.tag == myTask.Tag);
+
+                IQueryable<LocationWeights> l_weightsQuery = from l_w in _context.LocationWeights
+                                                   select l_w;
+                var temp_l_weights = new List<LocationWeights>(await l_weightsQuery.ToListAsync());
+                location_weights = temp_l_weights.Last(cat => cat.tag == myTask.Tag);               
+
+                int suggested_price = myTask.SuggestedPrice(weights.b0, weights.b1, weights.w0_1, weights.w0_2, weights.w0_3, location_weights.w1_1);
+                
+                if (myTask.Price!=0)
+                    myTask.BackPropagation(weights.b0, weights.b1, weights.w0_1, weights.w0_2, weights.w0_3, location_weights.w1_1, myTask.Price,location_weights.location, _context,weights.Id, location_weights.Id, myTask.Tag);
+                
                 _context.Add(myTask);
                 await _context.SaveChangesAsync();
+                ViewBag.Message = string.Format("The price we suggest for this task is " + suggested_price.ToString());
+                //return View(myTask);
                 return RedirectToAction(nameof(Index));
             }
             return View(myTask);

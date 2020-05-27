@@ -17,5 +17,7 @@ namespace MyPlanner.Data
         public DbSet<MyPlanner.Models.MyTask> MyTask { get; set; }
         public DbSet<MyPlanner.Models.User> User { get; set; }
         public DbSet<MyPlanner.Models.Message> Message { get; set; }
+        public DbSet<MyPlanner.Models.Weights> Weights { get; set; }
+        public DbSet<MyPlanner.Models.LocationWeights> LocationWeights { get; set; }
     }
 }
