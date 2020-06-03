@@ -29,10 +29,15 @@
             -moz-border-radius: 3px;
             -webkit-border-radius: 3px;
             text-shadow: 1px 1px black;
+            text-decoration-color: white;
             -webkit-box-shadow: 10px 10px 5px 0px rgba(69,44,69,1);
             -moz-box-shadow: 10px 10px 5px 0px rgba(69,44,69,1);
             box-shadow: 10px 10px 5px 0px rgba(69,44,69,1);
         }
+        .my-class { color: white }
+        .my-class:active { color: white }
+        .my-class:link { color: white }
+        .my-class:visited { color: white }
     </style>
     <body style="background:#1a1a1a">
         <h1><font color="white">List of registered users</font></h1>
@@ -54,7 +59,8 @@
                         <p> Rating: @Html.DisplayFor(modelItem => item.rating_float) <img src="~/Content/Images/star.png" width="22" height="22" /> </p>
 
                         <p>
-                            <a asp-action="Details" asp-route-id="@item.Id"><font color="white">See Profile</font></a>                            
+                            <a asp-action="Details" asp-route-id="@item.Id"><font color="white">See Profile</font></a> |
+                            <a><font color=white> @Html.ActionLink("Send Message", "Index", "Chat", new { contact = item.username, selected_contact = item.username } ,new{ @class = "my-class"})</font></a>
                         </p>
                     </font>
                 </div>

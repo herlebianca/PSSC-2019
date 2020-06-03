@@ -100,8 +100,9 @@ namespace MyPlanner.Controllers
                 string extension = Path.GetExtension(user.PictureFile.FileName);
                 fileName = fileName + DateTime.Now.ToString("yymmssffff") + extension;
                 //user.picture_path = "~/Content/Images/" + fileName;
-                user.picture_path= "C:/Users/bherle/source/repos/MyPlanner/MyPlanner/wwwroot/Content/Images/" + fileName;
-                user.PictureFile.CopyTo(new FileStream(user.picture_path, FileMode.Create));
+                string temp_path = "C:/Users/bherle/source/repos/MyPlanner/MyPlanner/wwwroot/Content/Images/" + fileName;
+                user.picture_path = "/Content/Images/" + fileName;
+                user.PictureFile.CopyTo(new FileStream(temp_path, FileMode.Create));
                 _context.Add(user);
                 logged_user = user;
                 await _context.SaveChangesAsync();
