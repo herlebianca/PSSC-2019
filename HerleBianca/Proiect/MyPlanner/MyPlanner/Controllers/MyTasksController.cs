@@ -87,32 +87,14 @@ namespace MyPlanner.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Description,Due_Date,Owner,Location,Urgency,Transfer,Duration,Physical_Effort,Tag,Asignee,Status,Rating")] MyTask myTask)
         {
-            Weights weights;
-            LocationWeights location_weights;
             if (ModelState.IsValid)
             {
                 myTask.Id = Guid.NewGuid();
 
-                IQueryable<Weights> weightsQuery = from w in _context.Weights
-                                                 select w;
-                var temp_weights = new List<Weights>(await weightsQuery.ToListAsync());
-                weights = temp_weights.Last(cat => cat.tag == myTask.Tag);
-
-                IQueryable<LocationWeights> l_weightsQuery = from l_w in _context.LocationWeights
-                                                   select l_w;
-                var temp_l_weights = new List<LocationWeights>(await l_weightsQuery.ToListAsync());
-                location_weights = temp_l_weights.Last(cat => cat.tag == myTask.Tag);               
-
-                int suggested_price = myTask.SuggestedPrice(weights.b0, weights.b1, weights.w0_1, weights.w0_2, weights.w0_3, location_weights.w1_1);
-                
-                if (myTask.Price!=0)
-                    myTask.BackPropagation(weights.b0, weights.b1, weights.w0_1, weights.w0_2, weights.w0_3, location_weights.w1_1, myTask.Price,location_weights.location, _context,weights.Id, location_weights.Id, myTask.Tag);
-                
                 _context.Add(myTask);
                 await _context.SaveChangesAsync();
-                ViewBag.Message = string.Format("The price we suggest for this task is " + suggested_price.ToString());
                 //return View(myTask);
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Edit", new {id=myTask.Id });
             }
             return View(myTask);
         }
@@ -120,6 +102,8 @@ namespace MyPlanner.Controllers
         // GET: MyTasks/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
+            Weights weights;
+            LocationWeights location_weights;
             if (id == null)
             {
                 return NotFound();
@@ -130,6 +114,21 @@ namespace MyPlanner.Controllers
             {
                 return NotFound();
             }
+            IQueryable<Weights> weightsQuery = from w in _context.Weights
+                                               select w;
+            var temp_weights = new List<Weights>(await weightsQuery.ToListAsync());
+            weights = temp_weights.Last(cat => cat.tag == myTask.Tag);
+
+            IQueryable<LocationWeights> l_weightsQuery = from l_w in _context.LocationWeights
+                                                         select l_w;
+            var temp_l_weights = new List<LocationWeights>(await l_weightsQuery.ToListAsync());
+            location_weights = temp_l_weights.Last(cat => cat.tag == myTask.Tag);
+
+            int suggested_price = myTask.SuggestedPrice(weights.b0, location_weights.b1, weights.w0_0, weights.w0_1, weights.w0_2, weights.w0_3, location_weights.w1_1);
+            if(myTask.Price==0)
+            {
+                ViewBag.Message = string.Format("The price we suggest for this task is " + suggested_price.ToString() + " RON. Enter price after you decide");
+            }                
             return View(myTask);
         }
 
@@ -138,7 +137,7 @@ namespace MyPlanner.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, string Description, DateTime Due_Date, string Owner, string Location,RatingType Rating, RatingType RatingOwn, MyTask.FakeBoolType Transfer,int Duration, MyTask.FakeBoolType Physical_Effort,MyTask.TagType Tag, string Asignee,MyTask.StatusType Status)
+        public async Task<IActionResult> Edit(Guid id, string Description, DateTime Due_Date, string Owner, string Location,RatingType Rating, RatingType RatingOwn, MyTask.FakeBoolType Transfer,int Duration, MyTask.FakeBoolType Physical_Effort,MyTask.TagType Tag, string Asignee,MyTask.StatusType Status, float Price)
         {
             var myTask = _context.MyTask.Find(id);
             var msg_err = false;
@@ -147,102 +146,144 @@ namespace MyPlanner.Controllers
             {
                 return NotFound();
             }
-
+            
             if (ModelState.IsValid)
             {
                 var user_asgn = _context.User.FirstOrDefault(m => m.username == Asignee);
+                string asgn_name =null;
+                if (user_asgn!=null)
+                    asgn_name = user_asgn.username;
                 var user_own = await _context.User.FirstOrDefaultAsync(n => n.username == Owner);
-                if (Description!=myTask.Description)
+                string own_name =null;
+                if (user_own != null)
+                    own_name = user_own.username;
+                if (UsersController.logged_user.username == asgn_name || UsersController.logged_user.username == own_name)
                 {
-                    myTask.Description = Description;
-                }
-                if(Due_Date!=myTask.Due_Date)
-                {
-                    myTask.Due_Date = Due_Date;
-                }
-                if(Owner!=myTask.Owner)
-                {
-                    myTask.Owner = Owner;
-                }
-                if(Location!=myTask.Location)
-                {
-                    myTask.Location = Location;
-                }    
-                if(Tag!=myTask.Tag)
-                {
-                    myTask.Tag = Tag;
-                }
-                if (Asignee != myTask.Asignee)
-                {
-                    myTask.Asignee = Asignee;
-                } 
-                if(Status!=myTask.Status)
-                {
-                    myTask.Status = Status;
-                }
-
-                if(Rating != RatingType.NoRating)
-                {                
-                    myTask.Rating = Rating;
-                    myTask.RatingInt = (int)Rating;
-                    user_asgn.rating_float = (user_asgn.no_ratings * user_asgn.rating_float + (int)Rating) / (user_asgn.no_ratings + 1);
-                    user_asgn.rating_float = (float)Math.Round(user_asgn.rating_float, 2);
-                    user_asgn.no_ratings = user_asgn.no_ratings + 1;
-                }
-               /* else
-                {
-                    ViewBag.Message = string.Format("Rating cannot be changed");
-                    msg_err = true;
-                }*/
-                if (RatingOwn != RatingType.NoRating)
-                {
-                    myTask.RatingOwn = RatingOwn;
-                    myTask.RatingOwnInt = (int)RatingOwn;
-                    user_own.rating_float = (user_own.no_ratings * user_own.rating_float + (int)RatingOwn) / (user_own.no_ratings + 1);
-                    user_own.rating_float = (float)Math.Round(user_own.rating_float, 2);
-                    user_own.no_ratings = user_own.no_ratings + 1;
-                }
-              /*  else
-                {
-                    ViewBag.Message = string.Format("Rating cannot be changed");
-                    msg_err = true;
-                } */
-                if (Transfer!=myTask.Transfer)
-                {
-                    myTask.Transfer = Transfer;
-                }
-                if(Duration!=myTask.Duration)
-                {
-                    myTask.Duration = Duration;
-                }
-                if(Physical_Effort!=myTask.Physical_Effort)
-                {
-                    myTask.Physical_Effort = Physical_Effort;
-                }
-
-                try
-                {
-                    if(user_asgn!=null)
-                        _context.Update(user_asgn);
-                    _context.Update(myTask);                    
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MyTaskExists(myTask.Id))
+                    if (Description != myTask.Description)
                     {
-                        return NotFound();
+                        myTask.Description = Description;
                     }
-                    else
+                    if (Due_Date != myTask.Due_Date)
                     {
-                        throw;
+                        myTask.Due_Date = Due_Date;
+                    }
+                    if (Owner != myTask.Owner)
+                    {
+                        myTask.Owner = Owner;
+                    }
+                    if (Location != myTask.Location)
+                    {
+                        myTask.Location = Location;
+                    }
+                    if (Tag != myTask.Tag)
+                    {
+                        myTask.Tag = Tag;
+                    }
+                    if (Asignee != myTask.Asignee)
+                    {
+                        myTask.Asignee = Asignee;
+                    }
+                    if (Status != myTask.Status)
+                    {
+                        myTask.Status = Status;
+                    }
+
+                    if (Rating != RatingType.NoRating && user_asgn != null)
+                    {
+                        myTask.Rating = Rating;
+                        myTask.RatingInt = (int)Rating;
+                        user_asgn.rating_float = (user_asgn.no_ratings * user_asgn.rating_float + (int)Rating) / (user_asgn.no_ratings + 1);
+                        user_asgn.rating_float = (float)Math.Round(user_asgn.rating_float, 2);
+                        user_asgn.no_ratings = user_asgn.no_ratings + 1;
+                    }
+                    /* else
+                     {
+                         ViewBag.Message = string.Format("Rating cannot be changed");
+                         msg_err = true;
+                     }*/
+                    if (RatingOwn != RatingType.NoRating && user_own != null)
+                    {
+                        myTask.RatingOwn = RatingOwn;
+                        myTask.RatingOwnInt = (int)RatingOwn;
+                        user_own.rating_float = (user_own.no_ratings * user_own.rating_float + (int)RatingOwn) / (user_own.no_ratings + 1);
+                        user_own.rating_float = (float)Math.Round(user_own.rating_float, 2);
+                        user_own.no_ratings = user_own.no_ratings + 1;
+                    }
+                    /*  else
+                      {
+                          ViewBag.Message = string.Format("Rating cannot be changed");
+                          msg_err = true;
+                      } */
+                    if (Transfer != myTask.Transfer)
+                    {
+                        myTask.Transfer = Transfer;
+                    }
+                    if (Duration != myTask.Duration)
+                    {
+                        myTask.Duration = Duration;
+                    }
+                    if (Physical_Effort != myTask.Physical_Effort)
+                    {
+                        myTask.Physical_Effort = Physical_Effort;
+                    }
+                    if (Price != 0)
+                    {
+                        myTask.Price = Price;
+                        Weights weights;
+                        LocationWeights location_weights;
+
+                        IQueryable<Weights> weightsQuery = from w in _context.Weights
+                                                           select w;
+                        var temp_weights = new List<Weights>(await weightsQuery.ToListAsync());
+                        weights = temp_weights.Last(cat => cat.tag == myTask.Tag);
+
+                        IQueryable<LocationWeights> l_weightsQuery = from l_w in _context.LocationWeights
+                                                                     select l_w;
+                        var temp_l_weights = new List<LocationWeights>(await l_weightsQuery.ToListAsync());
+                        location_weights = temp_l_weights.Last(cat => cat.tag == myTask.Tag);
+
+                        IQueryable<Weights> last_w_query = from lw in _context.Weights
+                                                         select lw;
+                        var temp_last_w = new List<Weights>(await last_w_query.ToListAsync());
+                        int last_w_id = temp_last_w.Last().Id; //get last id for saving new weights
+
+                        IQueryable<LocationWeights> last_loc_w_query = from loc_w in _context.LocationWeights
+                                                                       select loc_w;
+                        var temp_last_loc_w = new List<LocationWeights>(await last_loc_w_query.ToListAsync());
+                        int last_loc_w_id = temp_last_loc_w.Last().Id; //get last id for saving new location weights
+
+                        myTask.BackPropagation(weights.b0, location_weights.b1, weights.w0_0, weights.w0_1, weights.w0_2, weights.w0_3, location_weights.w1_1, myTask.Price, location_weights.location, _context, last_w_id, last_loc_w_id, myTask.Tag);
+                    }                        
+
+                    try
+                    {
+                        if (user_asgn != null)
+                            _context.Update(user_asgn);
+                        _context.Update(myTask);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!MyTaskExists(myTask.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
+                else
+                    msg_err = true;
+                
                 //return RedirectToAction("Dashboard", "Users", UsersController.logged_user);
                 //return RedirectToAction("Index");
                 if(!msg_err)
-                    ViewBag.Message = string.Format("Your changes have been saved");
-                
+                    return RedirectToAction("Dashboard", "Users", UsersController.logged_user);
+                else
+                    ViewBag.Message = string.Format("You are not allowed to change this information");
+
             }
             return View(myTask);
         }

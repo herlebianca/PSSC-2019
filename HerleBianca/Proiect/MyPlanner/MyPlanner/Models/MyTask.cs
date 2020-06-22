@@ -196,12 +196,13 @@ namespace MyPlanner.Models
         public float Price { get; set; }
 
         //Inputs for the suggest_price function
+        private float x0;
         private float x1;
         private float x2;
         private float x3;
         //Activations 
-        float a1;
-        float a2;
+        static float a1;
+        static float a2;
 
         static float learning_rate =0.01F;
         public MyTask()
@@ -249,9 +250,9 @@ namespace MyPlanner.Models
             else
                 return x;
         }
-        public int SuggestedPrice(float b0, float b1, float w0_1, float w0_2, float w0_3, float w1_1)
+        public int SuggestedPrice(float b0, float b1, float w0_0, float w0_1, float w0_2, float w0_3, float w1_1)
         {/*                        biases             | weights                                      */
-            
+            x0 = 1;
             // scale with a step of 0.2 , as there are 6 values of the enum, last one gets 0
             switch (this.Urgency)
             {
@@ -303,36 +304,61 @@ namespace MyPlanner.Models
                     break;
             }
      
-            a1 = ReLU(w0_1 * x1 + w0_2 * x2 + w0_3 * x3) + b0; //first layer
+            a1 = ReLU(w0_0 * x0 + w0_1 * x1 + w0_2 * x2 + w0_3 * x3) + b0; //first layer
             a2 = ReLU(w1_1 * a1) + b1; //second layer = final prediction            
             int suggested_price = (int)Math.Round(a2) * this.Duration;
             return suggested_price;
         }
-        public void BackPropagation(float b0_t0, float b1_t0, float w0_1_t0, float w0_2_t0, float w0_3_t0, float w1_1_t0, float actual_price,string location, MyPlannerContext _context,int weights_id, int weights_location_id, MyTask.TagType tag)
+        public void BackPropagation(float b0_t0, float b1_t0, float w0_0_t0, float w0_1_t0, float w0_2_t0, float w0_3_t0, float w1_1_t0, float actual_price,string location, MyPlannerContext _context,int weights_id, int weights_location_id, MyTask.TagType tag)
         {
+            float suggested_price = this.SuggestedPrice(b0_t0, b1_t0, w0_0_t0, w0_1_t0, w0_2_t0, w0_3_t0, w1_1_t0);
             float b0_t1 = b0_t0; //updated biases
             float b1_t1 = b1_t0;
-            float w0_1_t1 = w0_1_t0; //updated weights;
+            float w0_0_t1 = w0_0_t0; //updated weights;
+            float w0_1_t1 = w0_1_t0; 
             float w0_2_t1 = w0_2_t0;
             float w0_3_t1 = w0_3_t0;
             float w1_1_t1 = w1_1_t0; 
             int n = 0;
             float temp_correction_b0 =0;
-            actual_price = actual_price / this.Duration;
+            actual_price = actual_price / Duration;
             //Derivative of cost with respect to weights for second layer
             if (w1_1_t0 * a1 + b1_t0 > 0)
                 w1_1_t1 -= (learning_rate* 2 * (w1_1_t0 * a1 + b1_t0 - actual_price) * a1); 
             // Derivative of cost with respect to biases for second layer
             if (w1_1_t0 * a1 + b1_t0 >0 )
-                b1_t1 -=(learning_rate *2 * (w1_1_t0 * a1 + b1_t0 - actual_price)); 
+                b1_t1 -=(learning_rate *2 * (w1_1_t0 * a1 + b1_t0 - actual_price));
             //Derivative of cost with respect to weights for first layer
+            if (w0_0_t0 * x1 + b0_t0 > 0)
+            {
+                float correction = (learning_rate * 2 * (w0_0_t0 * x0 + b0_t0 -(  (actual_price - b1_t0) / w1_1_t0) * x0 * w1_1_t0) );
+                w0_0_t1 -= correction;
+            }
+                
             if (w0_1_t0 * x1 + b0_t0 > 0)
-                w0_1_t1 -= (learning_rate * 2 * (w0_1_t0 * x1 + b0_t0 - ((actual_price-b1_t0)/w1_1_t0) ) * x1 * w1_1_t0); 
+            {
+                float correction = (learning_rate * 2 * ((w0_1_t0 * x1 + b0_t0 - (actual_price - b1_t0) / w1_1_t0) * x1 * w1_1_t0));
+                w0_1_t1 -= correction;
+            }
+                 
             if (w0_2_t0 * x2 + b0_t0 > 0)
-                w0_2_t1 -= (learning_rate * 2 * (w0_2_t0 * x2 + b0_t0 - ((actual_price - b1_t0) / w1_1_t0)) * x2 * w1_1_t0);
+            {
+                float correction = (learning_rate * 2 * ((w0_2_t0 * x2 + b0_t0 - (actual_price - b1_t0) / w1_1_t0) * x2 * w1_1_t0));
+                w0_2_t1 -= correction;
+            }
+                
             if (w0_3_t0 * x3 + b0_t0 > 0)
-                w0_3_t1 -=  (learning_rate * 2 * (w0_3_t0 * x3 + b0_t0 - ((actual_price - b1_t0) / w1_1_t0)) * x3 * w1_1_t0);
+            {
+                float correction = (learning_rate * 2 * ((w0_3_t0 * x3 + b0_t0 - (actual_price - b1_t0) / w1_1_t0) * x3 * w1_1_t0));
+                w0_3_t1 -=  correction;
+            }
+                
             // Derivative of cost with respect to biases for first layer
+            if (w0_0_t0 * x0 + b0_t0 > 0)
+            {
+                temp_correction_b0 -= (learning_rate * 2 * (w0_0_t0 * x1 + b0_t0 - (actual_price - b1_t0) / w1_1_t0));
+                n += 1;
+            }
             if (w0_1_t0 * x1 + b0_t0 > 0)
             {
                 temp_correction_b0-=(learning_rate * 2 * (w0_1_t0 * x1 + b0_t0 - (actual_price - b1_t0) / w1_1_t0));
@@ -350,8 +376,8 @@ namespace MyPlanner.Models
             }
             b0_t1 += temp_correction_b0 / n;
 
-            Weights weights_t1 = new Weights(weights_id+1,w0_1_t1, w0_2_t1, w0_3_t1, b0_t1, b1_t1,tag);
-            LocationWeights location_weights_t1 = new LocationWeights(weights_location_id + 1,w1_1_t1, location,tag);
+            Weights weights_t1 = new Weights(weights_id+1, w0_0_t1, w0_1_t1, w0_2_t1, w0_3_t1, b0_t1, tag);
+            LocationWeights location_weights_t1 = new LocationWeights(weights_location_id + 1,w1_1_t1,b1_t1, location,tag);
             _context.Add(weights_t1);
             _context.Add(location_weights_t1);
         }

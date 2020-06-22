@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MyPlanner.Models.User>
+﻿@model MyPlanner.Models.UsersViewModel
 
 @{
     ViewData["Title"] = "All Users";
@@ -42,11 +42,16 @@
     <body style="background:#1a1a1a">
         <h1><font color="white">List of registered users</font></h1>
 
-        <p>
-            <a asp-action="Create"><font color="white">Create New</font></a>
-        </p>
+        <form asp-controller="Users" asp-action="Index" method="get">
+            <p>
+                <font color="white">
+                    Name: <input type="text" asp-for="Name" />
+                    <input type="submit" value="Search" />
+                </font>
+            </p>
+        </form>
         <div class="masonry">
-            @foreach (var item in Model)
+            @foreach (var item in Model.Users)
             {
                 <div class="item">
                     <font color=white>
@@ -60,7 +65,7 @@
 
                         <p>
                             <a asp-action="Details" asp-route-id="@item.Id"><font color="white">See Profile</font></a> |
-                            <a><font color=white> @Html.ActionLink("Send Message", "Index", "Chat", new { contact = item.username, selected_contact = item.username } ,new{ @class = "my-class"})</font></a>
+                            <a><font color=white> @Html.ActionLink("Send Message", "Index", "Chat", new { contact = item.username, selected_contact = item.username }, new { @class = "my-class" })</font></a>
                         </p>
                     </font>
                 </div>

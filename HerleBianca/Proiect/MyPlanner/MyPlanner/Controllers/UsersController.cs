@@ -25,11 +25,23 @@ namespace MyPlanner.Controllers
         }
 
         // GET: Users
-        public async Task<IActionResult>  Index()
+        public async Task<IActionResult>  Index(string name)
         {
+            var users = from u in _context.User select u;
+            if (!string.IsNullOrEmpty(name))
+            {                
+                users=users.Where(s => s.username.Contains(name) || s.first_name.Contains(name) || s.last_name.Contains(name));
+            }
+
+            var uvm = new UsersViewModel
+            {
+                Name = name,
+                Users = await users.ToListAsync()
+            };
+
             if (logged_user==null)
                 return RedirectToAction("Privacy", "Home"); //Privacy is used as default empty page
-            return View( await  _context.User.ToListAsync());
+            return View( uvm);
         }
 
         // GET: Users/Details/5
