@@ -90,13 +90,34 @@ namespace MyPlanner.Controllers
             if (ModelState.IsValid)
             {
                 myTask.Id = Guid.NewGuid();
-
+                var user_own = await _context.User.FirstOrDefaultAsync(n => n.username == myTask.Owner);
+                if (user_own==null)
+                {
+                    ViewBag.Message = string.Format("Owner does not exist");
+                    return View(myTask);
+                }
+                if(myTask.Due_Date < DateTime.Today)
+                {
+                    ViewBag.Message = string.Format("Date smaller than today");
+                    return View(myTask);
+                }
+                IQueryable<LocationWeights> location_query = from locations in _context.LocationWeights where locations.location==myTask.Location
+                                                               select locations;
+                var location_exist = new List<LocationWeights>(await location_query.ToListAsync());
+                if(!(location_exist.Any()))
+                {
+                    ViewBag.Message = string.Format("Location unavailable");
+                    return View(myTask);
+                }
                 _context.Add(myTask);
                 await _context.SaveChangesAsync();
                 //return View(myTask);
                 return RedirectToAction("Edit", new {id=myTask.Id });
             }
-            return View(myTask);
+            else
+            {
+                throw new System.Web.Http.HttpResponseException(System.Net.HttpStatusCode.BadRequest);
+            }
         }
 
         // GET: MyTasks/Edit/5
@@ -127,7 +148,7 @@ namespace MyPlanner.Controllers
             int suggested_price = myTask.SuggestedPrice(weights.b0, location_weights.b1, weights.w0_0, weights.w0_1, weights.w0_2, weights.w0_3, location_weights.w1_1);
             if(myTask.Price==0)
             {
-                ViewBag.Message = string.Format("The price we suggest for this task is " + suggested_price.ToString() + " RON. Enter price after you decide");
+                ViewBag.Message = string.Format("The price we suggest for this task is  "+ suggested_price.ToString() + " RON. Enter price after you decide");
             }                
             return View(myTask);
         }
@@ -137,10 +158,10 @@ namespace MyPlanner.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, string Description, DateTime Due_Date, string Owner, string Location,RatingType Rating, RatingType RatingOwn, MyTask.FakeBoolType Transfer,int Duration, MyTask.FakeBoolType Physical_Effort,MyTask.TagType Tag, string Asignee,MyTask.StatusType Status, float Price)
+        public async Task<IActionResult> Edit(Guid id, string Description, DateTime Due_Date, string Owner, string Location,RatingType Rating, RatingType RatingOwn, MyTask.FakeBoolType Transfer, int Duration, MyTask.FakeBoolType Physical_Effort,MyTask.TagType Tag, string Asignee,MyTask.StatusType Status, float Price)
         {
             var myTask = _context.MyTask.Find(id);
-            var msg_err = false;
+            bool msg_err = false;
             
             if (id != myTask.Id)
             {
@@ -151,12 +172,26 @@ namespace MyPlanner.Controllers
             {
                 var user_asgn = _context.User.FirstOrDefault(m => m.username == Asignee);
                 string asgn_name =null;
-                if (user_asgn!=null)
+                if (user_asgn != null)
                     asgn_name = user_asgn.username;
+                else
+                {
+                    if (!string.IsNullOrEmpty(Asignee))
+                    {
+                        ViewBag.Message = string.Format("User does not exist");
+                        return View(myTask);
+                    }
+                }                              
                 var user_own = await _context.User.FirstOrDefaultAsync(n => n.username == Owner);
                 string own_name =null;
                 if (user_own != null)
                     own_name = user_own.username;
+                else
+                {
+                    ViewBag.Message = string.Format("User does not exist");
+                    return View(myTask);
+                }
+               
                 if (UsersController.logged_user.username == asgn_name || UsersController.logged_user.username == own_name)
                 {
                     if (Description != myTask.Description)
@@ -240,7 +275,8 @@ namespace MyPlanner.Controllers
                         IQueryable<LocationWeights> l_weightsQuery = from l_w in _context.LocationWeights
                                                                      select l_w;
                         var temp_l_weights = new List<LocationWeights>(await l_weightsQuery.ToListAsync());
-                        location_weights = temp_l_weights.Last(cat => cat.tag == myTask.Tag);
+                        var loc_weights_list = temp_l_weights.Where(loc => loc.location == myTask.Location);
+                        location_weights = loc_weights_list.Last(cat => cat.tag == myTask.Tag);
 
                         IQueryable<Weights> last_w_query = from lw in _context.Weights
                                                          select lw;
@@ -281,11 +317,18 @@ namespace MyPlanner.Controllers
                 //return RedirectToAction("Index");
                 if(!msg_err)
                     return RedirectToAction("Dashboard", "Users", UsersController.logged_user);
-                else
+                else {
                     ViewBag.Message = string.Format("You are not allowed to change this information");
-
+                    return View(myTask);
+                }
+                
+                                
             }
-            return View(myTask);
+            else
+            {
+                throw new System.Web.Http.HttpResponseException(System.Net.HttpStatusCode.BadRequest);
+            }
+            
         }
 
         // GET: MyTasks/Delete/5
@@ -315,8 +358,8 @@ namespace MyPlanner.Controllers
             _context.MyTask.Remove(myTask);
             await _context.SaveChangesAsync();
             ViewBag.Message = string.Format("Your changes have been saved");
-            return View(myTask);
-            //return RedirectToAction(nameof(Index));
+            //return View(myTask);
+            return RedirectToAction("Dashboard", "Users");
         }
 
         private bool MyTaskExists(Guid id)

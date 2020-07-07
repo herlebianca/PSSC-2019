@@ -26,16 +26,6 @@ namespace MyPlanner
             {
                 var services = scope.ServiceProvider;
 
-               /* try
-                {
-                    SeedData.Initialize(services);
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred seeding the DB.");
-                    Console.WriteLine("An error occurred seeding the DB.");
-                } */
             }
 
            host.Run();

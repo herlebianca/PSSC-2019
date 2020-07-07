@@ -17,9 +17,10 @@ namespace MyPlanner.Models
             set { this._id = value; }
         }
 
-        [Required]
+        
         [Display(Name = "Description")]
         private string _description;
+        [Required]
         public string Description
         {
             get { return _description; }
@@ -29,7 +30,7 @@ namespace MyPlanner.Models
         [DataType(DataType.Date)]
         [Display(Name = "Due Date")]
         private DateTime _due_date;
-
+        [Required]
         public DateTime Due_Date
         {
             get { return _due_date; }
@@ -38,6 +39,7 @@ namespace MyPlanner.Models
 
         [Display(Name = "Owner")]
         private string _owner_name;
+        [Required]
         public string Owner
         {
             get { return this._owner_name; }
@@ -45,7 +47,9 @@ namespace MyPlanner.Models
         }
 
         [Display(Name = "Location")]
+        [Required]
         private string _location { get; set; }
+        [Required]
         public string Location
         {
             get { return this._location; }
@@ -94,6 +98,7 @@ namespace MyPlanner.Models
 
         [Display(Name = "Duration in hours")]
         private int _duration { get; set; }
+        [Required]
         public int Duration
         {
             get { return this._duration; }
@@ -204,7 +209,7 @@ namespace MyPlanner.Models
         static float a1;
         static float a2;
 
-        static float learning_rate =0.01F;
+        static float learning_rate =0.001F;
         public MyTask()
         {
             this._id = new Guid();
@@ -306,7 +311,7 @@ namespace MyPlanner.Models
      
             a1 = ReLU(w0_0 * x0 + w0_1 * x1 + w0_2 * x2 + w0_3 * x3) + b0; //first layer
             a2 = ReLU(w1_1 * a1) + b1; //second layer = final prediction            
-            int suggested_price = (int)Math.Round(a2) * this.Duration;
+            int suggested_price = (int)(Math.Round(a2) * this.Duration);
             return suggested_price;
         }
         public void BackPropagation(float b0_t0, float b1_t0, float w0_0_t0, float w0_1_t0, float w0_2_t0, float w0_3_t0, float w1_1_t0, float actual_price,string location, MyPlannerContext _context,int weights_id, int weights_location_id, MyTask.TagType tag)

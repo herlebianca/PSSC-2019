@@ -113,24 +113,28 @@
                 <tbody>
                     @foreach (var item in Model.MyTasks_asigned)
                     {
-                        <tr>
-                            <td>
-                                <font color="antiquewhite">
-                                    @Html.DisplayFor(modelItem => item.Description)
-                                </font>
-                            </td>
+                        @if (item.RatingInt != 0)
+                        {
+                            <tr>
+                                <td>
+                                    <font color="antiquewhite">
+                                        @Html.DisplayFor(modelItem => item.Description)
+                                    </font>
+                                </td>
 
-                            <td>
-                                <font color="antiquewhite">
-                                    @Html.DisplayFor(modelItem => item.Tag)
-                                </font>
-                            </td>
-                            <td>
-                                <font color="antiquewhite">
-                                    @Html.DisplayFor(modelItem => item.RatingInt)<img src="~/Content/Images/star.png" width="22" height="22" />
-                                </font>
-                            </td>
-                        </tr>
+                                <td>
+                                    <font color="antiquewhite">
+                                        @Html.DisplayFor(modelItem => item.Tag)
+                                    </font>
+                                </td>
+                                <td>
+                                    <font color="antiquewhite">
+                                        @Html.DisplayFor(modelItem => item.RatingInt)<img src="~/Content/Images/star.png" width="22" height="22" />
+                                    </font>
+                                </td>
+                            </tr>
+                        }
+
                     }
                 </tbody>
             </table>
@@ -163,23 +167,27 @@
                 <tbody>
                     @foreach (var item in Model.MyTasks_owner)
                     {
-                        <tr>
-                            <td>
-                                <font color="antiquewhite">
-                                    @Html.DisplayFor(modelItem => item.Description)
-                                </font>
-                            </td>
-                            <td>
-                                <font color="antiquewhite">
-                                    @Html.DisplayFor(modelItem => item.Tag)
-                                </font>
-                            </td>
-                            <td>
-                                <font color="antiquewhite">
-                                    @Html.DisplayFor(modelItem => item.RatingInt) <img src="~/Content/Images/star.png" width="22" height="22" />
-                                </font>
-                            </td>
-                        </tr>
+                        @if (item.RatingOwnInt != 0)
+                        {
+                            <tr>
+                                <td>
+                                    <font color="antiquewhite">
+                                        @Html.DisplayFor(modelItem => item.Description)
+                                    </font>
+                                </td>
+                                <td>
+                                    <font color="antiquewhite">
+                                        @Html.DisplayFor(modelItem => item.Tag)
+                                    </font>
+                                </td>
+                                <td>
+                                    <font color="antiquewhite">
+                                        @Html.DisplayFor(modelItem => item.RatingOwnInt) <img src="~/Content/Images/star.png" width="22" height="22" />
+                                    </font>
+                                </td>
+                            </tr>
+                        }
+
                     }
                 </tbody>
             </table>

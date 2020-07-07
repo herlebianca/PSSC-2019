@@ -21,7 +21,6 @@ namespace MyPlanner.Controllers
         public UsersController(MyPlannerContext context)
         {
             _context = context;
-            logged_user = _context.User.FirstOrDefault(m => m.username == "bianca_alexandra"); 
         }
 
         // GET: Users
@@ -82,8 +81,8 @@ namespace MyPlanner.Controllers
             }
             var myTasks = from m in _context.MyTask select m;
             var myTasks2 = from n in _context.MyTask select n;
-            myTasks = myTasks.Where(s => s.Asignee.Contains(user.username));
-            myTasks2 = myTasks2.Where(x => x.Owner.Contains(user.username));
+            myTasks = myTasks.Where(s => s.Asignee.Contains(user.username) && s.RatingInt!=0);
+            myTasks2 = myTasks2.Where(x => x.Owner.Contains(user.username) && x.RatingOwnInt != 0);
             user.MyTasks_asigned = await myTasks.ToListAsync();
             user.MyTasks_owner = await myTasks2.ToListAsync();         
 
@@ -286,14 +285,17 @@ namespace MyPlanner.Controllers
                                               select m.Asignee;
 
             var myTasks = from m in _context.MyTask
+                          where m.Asignee==name || m.Owner==name
+                          orderby m.Due_Date
                           select m;
+                         
 
             if (string.IsNullOrEmpty(name))
             {
                 name = logged_user.username;
             }
 
-            myTasks = myTasks.Where(x => x.Asignee == name || x.Owner==name);            
+           // myTasks = myTasks.Where(x => x.Asignee == name || x.Owner==name);            
        
             var myTaskAsigneeVM = new MyTaskAsigneeViewModel
               {
@@ -301,7 +303,7 @@ namespace MyPlanner.Controllers
                   MyTasks = await myTasks.ToListAsync()
                   
               };
-              
+
             return View(myTaskAsigneeVM);
            
         }

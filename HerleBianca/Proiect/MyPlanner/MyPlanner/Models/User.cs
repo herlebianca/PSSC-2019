@@ -12,6 +12,7 @@ namespace MyPlanner.Models
     public class User
     {
         public Guid Id { get; set; }
+
         [Display(Name = "First Name")]
         public string first_name { get; set; }
 
